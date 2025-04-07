@@ -19,6 +19,12 @@ use ModelContextProtocol\SDK\Shared\Transport;
 
 class SseServerTransport implements Transport
 {
+    private $onClose;
+
+    private $onMessage;
+
+    private $onError;
+
     public function __construct(
         protected RequestInterface $request,
         protected ResponseInterface $response,
@@ -34,6 +40,9 @@ class SseServerTransport implements Transport
 
     public function handleMessage(string $message): void
     {
+        if ($this->onMessage) {
+            call_user_func($this->onMessage, $message);
+        }
     }
 
     public function send(string $message): void
@@ -46,13 +55,16 @@ class SseServerTransport implements Transport
 
     public function setOnMessage(callable $callback): void
     {
+        $this->onMessage = $callback;
     }
 
     public function setOnClose(callable $callback): void
     {
+        $this->onClose = $callback;
     }
 
     public function setOnError(callable $callback): void
     {
+        $this->onError = $callback;
     }
 }

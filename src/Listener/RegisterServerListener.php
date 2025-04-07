@@ -45,6 +45,9 @@ class RegisterServerListener implements ListenerInterface
         foreach ($servers as $name => $server) {
             $server = $this->serverManager->getServer($name);
             $transport = make(SseServerTransport::class);
+            $transport->setOnMessage(function ($message) use ($server) {
+                $server->handleMessage($message);
+            });
             $server->connect($transport);
 
             Router::addServer($server['sse']['server'], function () use ($server, $transport) {
