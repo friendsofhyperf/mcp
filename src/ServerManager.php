@@ -31,8 +31,8 @@ class ServerManager
             throw new RuntimeException(sprintf('Server %s not found.', $name));
         }
 
-        $serverConfig = Arr::only($servers[$name] ?? [], ['name', 'version', 'description']);
+        $serverInfo = Arr::only($servers[$name] ?? [], ['name', 'version', 'description']);
 
-        return new McpServer($serverConfig);
+        return new McpServer($serverInfo);
     }
 }
