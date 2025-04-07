@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Annotation;
 
 use Attribute;
+use Hyperf\Di\ReflectionManager;
 use InvalidArgumentException;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -48,9 +49,23 @@ class Prompt extends BaseAnnotation
         ];
     }
 
+    /**
+     * @return array{name:string,description?:string,required?:bool,}[]
+     */
     private function buildArguments(string $className, string $target): array
     {
-        // @TODO build arguments
-        return [];
+        $reflection = ReflectionManager::reflectMethod($className, $target);
+        $parameters = $reflection->getParameters();
+        $arguments = [];
+
+        foreach ($parameters as $parameter) {
+            $arguments[] = [
+                'name' => $parameter->getName(),
+                'description' => self::getDescription($parameter),
+                'required' => ! $parameter->isOptional(),
+            ];
+        }
+
+        return $arguments;
     }
 }
