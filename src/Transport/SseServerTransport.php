@@ -51,13 +51,12 @@ class SseServerTransport implements Transport
     {
         $sessionId = uniqid('sess_', true);
         $fd = RequestContext::get()->getSwooleRequest()->fd; // @phpstan-ignore method.notFound
-
         $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$route}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
 
-        CoordinatorManager::until("mcp:fd:{$fd}")->yield();
+        CoordinatorManager::until("mcp-sse:fd:{$fd}")->yield();
 
         if (isset($this->connections[$sessionId])) {
             unset($this->connections[$sessionId]);

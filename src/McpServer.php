@@ -19,6 +19,6 @@ class McpServer extends Server implements OnCloseInterface
 {
     public function onClose($server, int $fd, int $reactorId): void
     {
-        CoordinatorManager::until("mcp:fd:{$fd}")->resume();
+        CoordinatorManager::until("mcp-sse:fd:{$fd}")->resume();
     }
 }
