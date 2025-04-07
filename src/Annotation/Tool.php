@@ -37,6 +37,9 @@ class Tool extends BaseAnnotation
             );
     }
 
+    /**
+     * @return array{name:string,description?:string,inputSchema:array{type:string,properties:array{name:string,type:string,description?:string}[],required:string[],additionalProperties:bool,$schema:string}}
+     */
     private function buildDefinition(string $className, string $target): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
@@ -50,6 +53,9 @@ class Tool extends BaseAnnotation
         ];
     }
 
+    /**
+     * @return array{type:string,properties:array{name:string,type:string,description?:string}[],required:string[],additionalProperties:bool,$schema:string}
+     */
     private function buildInputSchema(string $className, string $target): array
     {
         $reflection = ReflectionManager::reflectMethod($className, $target);
