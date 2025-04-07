@@ -19,7 +19,7 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Shared\Transport;
 use Throwable;
 
-class SseServerTransport implements Transport
+class SseCoroutineServerTransport implements Transport
 {
     /**
      * @var callable

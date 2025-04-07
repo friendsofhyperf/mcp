@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Listener;
 
+use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use FriendsOfHyperf\MCP\ServerManager;
-use FriendsOfHyperf\MCP\Transport\SseServerTransport;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;

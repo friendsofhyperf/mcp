@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
+use FriendsOfHyperf\MCP\Contract\SseServerTransport;
+use FriendsOfHyperf\MCP\Transport\SseCoroutineServerTransport;
+
 define('BASE_PATH', dirname(__DIR__));
 
 return [
+    'dependencies' => [
+        SseServerTransport::class => SseCoroutineServerTransport::class,
+    ],
     'publish' => [
         [
             'id' => 'config',
