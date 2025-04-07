@@ -33,15 +33,20 @@ class Resource extends BaseAnnotation
             ->getServer($this->server)
             ->resource(
                 scheme: $this->schema,
-                template: new ResourceTemplate(
-                    template: $this->template,
-                    options: [
-                        'name' => $this->name,
-                        'description' => $this->description,
-                        'mimeType' => $this->mimeType,
-                    ],
-                ),
+                template: $this->buildTemplate($className, $target),
                 handler: [$this->getContainer()->get($className), $target],
             );
+    }
+
+    private function buildTemplate(string $className, string $target): ResourceTemplate
+    {
+        return new ResourceTemplate(
+            template: $this->template,
+            options: [
+                'name' => $this->name,
+                'description' => $this->description,
+                'mimeType' => $this->mimeType,
+            ],
+        );
     }
 }
