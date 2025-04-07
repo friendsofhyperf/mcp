@@ -21,10 +21,19 @@ use Throwable;
 
 class SseServerTransport implements Transport
 {
+    /**
+     * @var callable
+     */
     private $onClose;
 
+    /**
+     * @var callable
+     */
     private $onMessage;
 
+    /**
+     * @var callable
+     */
     private $onError;
 
     /**
