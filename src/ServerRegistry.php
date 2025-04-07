@@ -18,6 +18,8 @@ use ModelContextProtocol\SDK\Server\McpServer;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
 
+use function Hyperf\Tappable\tap;
+
 class ServerRegistry
 {
     /**
@@ -31,35 +33,38 @@ class ServerRegistry
 
     public function register(string $name, McpServer $server): void
     {
-        foreach ((array) ToolCollector::get($name, []) as $name => $tool) {
-            $server->tool(
-                name: $name,
-                handler: [$this->container->get($tool['className']), $tool['target']],
-                definition: $tool['definition'],
-            );
-        }
+        $this->servers[$name] = tap($server, function ($server) use ($name) {
+            $serverName = $name;
 
-        foreach ((array) ResourceCollector::get($name, []) as $scheme => $resource) {
-            $server->resource(
-                scheme: $scheme,
-                handler: [$this->container->get($resource['className']), $resource['target']],
-                template: $resource['template'],
-            );
-        }
+            foreach ((array) ToolCollector::get($serverName, []) as $name => $tool) {
+                $server->tool(
+                    name: $name,
+                    handler: [$this->container->get($tool['className']), $tool['target']],
+                    definition: $tool['definition'],
+                );
+            }
 
-        foreach ((array) PromptCollector::get($name, []) as $prompt) {
-            $server->prompt(
-                name: $prompt['name'],
-                handler: [$this->container->get($prompt['className']), $prompt['target']],
-                definition: $prompt['definition'],
-            );
-        }
+            foreach ((array) ResourceCollector::get($serverName, []) as $scheme => $resource) {
+                $server->resource(
+                    scheme: $scheme,
+                    handler: [$this->container->get($resource['className']), $resource['target']],
+                    template: $resource['template'],
+                );
+            }
 
-        $this->servers[$name] = $server;
+            foreach ((array) PromptCollector::get($serverName, []) as $prompt) {
+                $server->prompt(
+                    name: $prompt['name'],
+                    handler: [$this->container->get($prompt['className']), $prompt['target']],
+                    definition: $prompt['definition'],
+                );
+            }
+        });
     }
 
     public function get(string $name): McpServer
     {
+        var_dump($name, array_keys($this->servers));
         if (! isset($this->servers[$name])) {
             throw new RuntimeException(sprintf('Server %s not found.', $name));
         }

@@ -13,11 +13,12 @@ namespace FriendsOfHyperf\MCP\Command;
 
 use FriendsOfHyperf\MCP\ServerRegistry;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
+use Hyperf\Command\Command;
 use Throwable;
 
 use function Hyperf\Support\make;
 
-class MCPCommand extends \Hyperf\Command\Command
+class MCPCommand extends Command
 {
     protected bool $coroutine = false;
 
