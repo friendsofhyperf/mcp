@@ -37,7 +37,7 @@ class Tool extends BaseAnnotation
             );
     }
 
-    public function buildDefinition(string $className, string $target): array
+    private function buildDefinition(string $className, string $target): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
             throw new InvalidArgumentException('Tool name must be alphanumeric and underscores.');
