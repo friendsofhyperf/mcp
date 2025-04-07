@@ -33,15 +33,11 @@ class Tool extends BaseAnnotation
             ->tool(
                 name: $this->name,
                 handler: [$this->getContainer()->get($className), $target],
-                definition: [
-                    'name' => $this->name,
-                    'description' => $this->description,
-                    'inputSchema' => $this->generateInputSchema($className, $target),
-                ]
+                definition: $this->buildDefinition($className, $target),
             );
     }
 
-    public function toDefinition(string $className, string $target): array
+    public function buildDefinition(string $className, string $target): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
             throw new InvalidArgumentException('Tool name must be alphanumeric and underscores.');
@@ -50,11 +46,11 @@ class Tool extends BaseAnnotation
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'inputSchema' => $this->generateInputSchema($className, $target),
+            'inputSchema' => $this->buildInputSchema($className, $target),
         ];
     }
 
-    private function generateInputSchema(string $className, string $target): array
+    private function buildInputSchema(string $className, string $target): array
     {
         $reflection = ReflectionManager::reflectMethod($className, $target);
         $parameters = $reflection->getParameters();
