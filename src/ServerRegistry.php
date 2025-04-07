@@ -14,7 +14,6 @@ namespace FriendsOfHyperf\MCP;
 use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use FriendsOfHyperf\MCP\Collector\ToolCollector;
-use Hyperf\Contract\ConfigInterface;
 use ModelContextProtocol\SDK\Server\McpServer;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -26,10 +25,8 @@ class ServerRegistry
      */
     protected array $servers = [];
 
-    public function __construct(
-        protected ContainerInterface $container,
-        protected ConfigInterface $config,
-    ) {
+    public function __construct(protected ContainerInterface $container)
+    {
     }
 
     public function register(string $name, McpServer $server): void

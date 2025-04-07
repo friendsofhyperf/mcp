@@ -14,6 +14,7 @@ namespace FriendsOfHyperf\MCP;
 use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use FriendsOfHyperf\MCP\Collector\ToolCollector;
+use FriendsOfHyperf\MCP\Command\MCPCommand;
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use FriendsOfHyperf\MCP\Transport\SseCoroutineServerTransport;
 
@@ -24,6 +25,9 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
+            'commands' => [
+                MCPCommand::class,
+            ],
             'dependencies' => [
                 SseServerTransport::class => SseCoroutineServerTransport::class,
             ],

@@ -28,6 +28,7 @@ class MCPCommand extends \Hyperf\Command\Command
     public function __construct(
         protected ServerRegistry $registry,
     ) {
+        parent::__construct();
     }
 
     public function handle(): void
