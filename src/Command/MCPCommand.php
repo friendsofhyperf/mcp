@@ -34,7 +34,7 @@ class MCPCommand extends \Hyperf\Command\Command
         $input = STDIN;
         stream_set_blocking($input, false);
 
-        while (true) {
+        while (true) { // @phpstan-ignore-line
             $line = fgets($input);
 
             if ($line !== false && trim($line) !== '') {
