@@ -52,9 +52,6 @@ class RegisterServerListener implements ListenerInterface
             $this->registry->register($name, $server = new McpServer($serverInfo));
 
             $transport = make(SseServerTransport::class);
-            $transport->setOnMessage(fn ($message) => $server->handleMessage($message));
-            $transport->setOnError(fn ($error) => $server->handleError($error));
-            $transport->setOnClose(fn () => $server->handleClose());
             $server->connect($transport);
 
             $serverName = $options['sse']['server'] ?? 'http';

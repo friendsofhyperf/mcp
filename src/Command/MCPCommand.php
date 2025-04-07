@@ -44,9 +44,6 @@ class MCPCommand extends Command
             'input' => $this->input,
             'output' => $this->output,
         ]);
-        $transport->setOnMessage(fn ($message) => $server->handleMessage($message));
-        $transport->setOnError(fn ($error) => $server->handleError($error));
-        $transport->setOnClose(fn () => $server->handleClose());
         $server->connect($transport);
 
         while (true) { // @phpstan-ignore-line
