@@ -22,17 +22,17 @@ use Throwable;
 class SseCoroutineServerTransport implements Transport
 {
     /**
-     * @var callable
+     * @var callable|null
      */
     private $onClose;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $onMessage;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $onError;
 
@@ -47,13 +47,13 @@ class SseCoroutineServerTransport implements Transport
     ) {
     }
 
-    public function start(string $route): void
+    public function start(string $endpoint): void
     {
         $sessionId = uniqid('sess_', true);
         $fd = RequestContext::get()->getSwooleRequest()->fd; // @phpstan-ignore method.notFound
         $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
             ->write('event: endpoint' . PHP_EOL)
-            ->write("data: {$route}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
+            ->write("data: {$endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
 
         CoordinatorManager::until("mcp-sse:fd:{$fd}")->yield();

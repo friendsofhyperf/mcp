@@ -52,14 +52,17 @@ class RegisterServerListener implements ListenerInterface
             $transport->setOnClose(fn () => $server->handleClose());
             $server->connect($transport);
 
-            Router::addServer($server['sse']['server'] ?? 'http', function () use ($server, $transport) {
+            $serverName = $server['sse']['server'] ?? 'http';
+            $endpoint = $server['sse']['endpoint'] ?? '/sse';
+
+            Router::addServer($serverName, function () use ($transport, $endpoint) {
                 Router::addRoute(
                     ['GET', 'POST'],
-                    $route = $server['sse']['route'] ?? '/',
-                    function (RequestInterface $request) use ($transport, $route) {
+                    $endpoint,
+                    function (RequestInterface $request) use ($transport, $endpoint) {
                         try {
                             match ($request->getMethod()) {
-                                'GET' => $transport->start($route),
+                                'GET' => $transport->start($endpoint),
                                 'POST' => $transport->handleMessage($request->getBody()->getContents()),
                                 default => throw new RuntimeException('Method not allowed'),
                             };

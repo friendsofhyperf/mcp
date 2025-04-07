@@ -17,7 +17,7 @@ return [
             // The options of the sse server
             'sse' => [
                 'server' => 'http',
-                'route' => '/sse',
+                'endpoint' => '/sse',
             ],
         ],
     ],
