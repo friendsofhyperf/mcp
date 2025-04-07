@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Annotation;
 
 use Attribute;
+use InvalidArgumentException;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Prompt extends BaseAnnotation
@@ -30,10 +31,26 @@ class Prompt extends BaseAnnotation
             ->prompt(
                 name: $this->name,
                 handler: [$this->getContainer()->get($className), $target],
-                definition: [
-                    'description' => $this->description,
-                    'arguments' => [], // @TODO build arguments
-                ],
+                definition: $this->buildDefinition($className, $target),
             );
+    }
+
+    private function buildDefinition(string $className, string $target): array
+    {
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
+            throw new InvalidArgumentException('Prompt name must be alphanumeric and underscores.');
+        }
+
+        return [
+            'name' => $this->name,
+            'description' => $this->description,
+            'arguments' => $this->buildArguments($className, $target),
+        ];
+    }
+
+    private function buildArguments(string $className, string $target): array
+    {
+        // @TODO build arguments
+        return [];
     }
 }
