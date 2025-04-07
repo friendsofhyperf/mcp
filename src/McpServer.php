@@ -22,11 +22,4 @@ class McpServer extends Server implements OnCloseInterface
     {
         CoordinatorManager::until("mcp:fd:{$fd}")->resume();
     }
-
-    protected function getDefaultExceptionHandler(): array
-    {
-        return [
-            McpSseExceptionHandler::class,
-        ];
-    }
 }
