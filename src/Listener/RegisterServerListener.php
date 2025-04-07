@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Listener;
 
-use Exception;
 use FriendsOfHyperf\MCP\ServerManager;
 use FriendsOfHyperf\MCP\Transport\SseServerTransport;
 use Hyperf\Contract\ConfigInterface;
@@ -20,6 +19,8 @@ use Hyperf\Framework\Event\BootApplication;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Router;
+use RuntimeException;
+use Throwable;
 
 use function Hyperf\Support\make;
 
@@ -52,16 +53,21 @@ class RegisterServerListener implements ListenerInterface
             $server->connect($transport);
 
             Router::addServer($server['sse']['server'] ?? 'http', function () use ($server, $transport) {
-                Router::get($route = $server['sse']['route'] ?? '/', function () use ($transport, $route) {
-                    $transport->start($route);
-                });
-                Router::post($route, function (RequestInterface $request) use ($transport) {
-                    try {
-                        $transport->handleMessage($request->getBody()->getContents());
-                    } catch (Exception $e) {
-                        $transport->handleError($e);
+                Router::addRoute(
+                    ['GET', 'POST'],
+                    $route = $server['sse']['route'] ?? '/',
+                    function (RequestInterface $request) use ($transport, $route) {
+                        try {
+                            match ($request->getMethod()) {
+                                'GET' => $transport->start($route),
+                                'POST' => $transport->handleMessage($request->getBody()->getContents()),
+                                default => throw new RuntimeException('Method not allowed'),
+                            };
+                        } catch (Throwable $e) {
+                            $transport->handleError($e);
+                        }
                     }
-                });
+                );
             });
         }
     }
