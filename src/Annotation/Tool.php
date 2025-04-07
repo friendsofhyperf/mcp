@@ -29,7 +29,7 @@ class Tool extends BaseAnnotation
     public function collectMethod(string $className, ?string $target): void
     {
         $this->getServerManager()
-            ->getServer($this->server)
+            ->get($this->server)
             ->tool(
                 name: $this->name,
                 handler: [$this->getContainer()->get($className), $target],

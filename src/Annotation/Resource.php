@@ -30,7 +30,7 @@ class Resource extends BaseAnnotation
     public function collectMethod(string $className, ?string $target): void
     {
         $this->getServerManager()
-            ->getServer($this->server)
+            ->get($this->server)
             ->resource(
                 scheme: $this->scheme,
                 template: $this->buildTemplate($className, $target),

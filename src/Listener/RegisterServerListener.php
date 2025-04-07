@@ -12,13 +12,15 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Listener;
 
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
-use FriendsOfHyperf\MCP\ServerManager;
+use FriendsOfHyperf\MCP\ServerRegistry;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Router;
+use ModelContextProtocol\SDK\Server\McpServer;
 use RuntimeException;
 use Throwable;
 
@@ -29,7 +31,7 @@ class RegisterServerListener implements ListenerInterface
     public function __construct(
         protected DispatcherFactory $dispatcherFactory, // Don't remove this line
         protected ConfigInterface $config,
-        protected ServerManager $serverManager,
+        protected ServerRegistry $registry,
     ) {
     }
 
@@ -44,8 +46,11 @@ class RegisterServerListener implements ListenerInterface
     {
         $servers = $this->config->get('mcp.servers', []);
 
-        foreach ($servers as $name => $server) {
-            $server = $this->serverManager->getServer($name);
+        foreach ($servers as $server) {
+            $name = $server['name'] ?? '';
+            $serverInfo = Arr::only($server, ['name', 'version', 'description']);
+            $this->registry->register($name, $server = make(McpServer::class, $serverInfo));
+
             $transport = make(SseServerTransport::class);
             $transport->setOnMessage(fn ($message) => $server->handleMessage($message));
             $transport->setOnError(fn ($error) => $server->handleError($error));

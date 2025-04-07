@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Command;
 
-use FriendsOfHyperf\MCP\ServerManager;
+use FriendsOfHyperf\MCP\ServerRegistry;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
 use Throwable;
 
@@ -19,18 +19,20 @@ use function Hyperf\Support\make;
 
 class MCPCommand extends \Hyperf\Command\Command
 {
+    protected bool $coroutine = false;
+
     protected ?string $signature = 'mcp:run {--name= : The name of the mcp server.}';
 
     protected string $description = 'This command runs the mcp server.';
 
     public function __construct(
-        protected ServerManager $serverManager,
+        protected ServerRegistry $registry,
     ) {
     }
 
     public function handle(): void
     {
-        $server = $this->serverManager->getServer($this->input->getOption('name'));
+        $server = $this->registry->get($this->input->getOption('name'));
         $transport = make(StdioServerTransport::class);
         $transport->setOnMessage(fn ($message) => $server->handleMessage($message));
         $transport->setOnError(fn ($error) => $server->handleError($error));

@@ -11,28 +11,33 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
-use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
 use ModelContextProtocol\SDK\Server\McpServer;
 use RuntimeException;
 
-class ServerManager
+class ServerRegistry
 {
+    /**
+     * @var array<string, McpServer>
+     */
+    protected array $servers = [];
+
     public function __construct(
         protected ConfigInterface $config
     ) {
     }
 
-    public function getServer(string $name): McpServer
+    public function register(string $name, McpServer $server): void
     {
-        $servers = $this->config->get('mcp.servers', []);
+        $this->servers[$name] = $server;
+    }
 
-        if (! isset($servers[$name])) {
+    public function get(string $name): McpServer
+    {
+        if (! isset($this->servers[$name])) {
             throw new RuntimeException(sprintf('Server %s not found.', $name));
         }
 
-        $serverInfo = Arr::only($servers[$name] ?? [], ['name', 'version', 'description']);
-
-        return new McpServer($serverInfo);
+        return $this->servers[$name];
     }
 }
