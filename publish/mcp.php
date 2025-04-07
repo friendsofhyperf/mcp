@@ -13,8 +13,8 @@ return [
         [
             'name' => 'demo',
             'version' => '1.0.0',
-            'description' => 'This is a demo route',
-            // The route of the sse server
+            'description' => 'This is a demo mcp server.',
+            // The options of the sse server
             'sse' => [
                 'server' => 'http',
                 'route' => '/sse',
