@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\MCP\Annotation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Prompt
+class Prompt extends BaseAnnotation
 {
     public function __construct(
         public string $name = '',

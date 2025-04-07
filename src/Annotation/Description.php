@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\MCP\Annotation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Description
+class Description extends BaseAnnotation
 {
     public function __construct(public string $description = '')
     {

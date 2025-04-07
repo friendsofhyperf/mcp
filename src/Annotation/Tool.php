@@ -12,15 +12,78 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Annotation;
 
 use Attribute;
-use Hyperf\Di\Annotation\AbstractAnnotation;
+use Hyperf\Di\ReflectionManager;
+use InvalidArgumentException;
+use ReflectionParameter;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Tool extends AbstractAnnotation
+class Tool extends BaseAnnotation
 {
     public function __construct(
         public string $name = '',
         public string $description = '',
         public string $server = '',
     ) {
+    }
+
+    public function collectMethod(string $className, ?string $target): void
+    {
+        $this->getServerManager()
+            ->getServer($this->server)
+            ->tool(
+                name: $this->name,
+                handler: [$this->getContainer()->get($className), $target],
+                definition: [
+                    'name' => $this->name,
+                    'description' => $this->description,
+                    'inputSchema' => $this->generateInputSchema($className, $target),
+                ]
+            );
+    }
+
+    public function toDefinition(string $className, string $target): array
+    {
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
+            throw new InvalidArgumentException('Tool name must be alphanumeric and underscores.');
+        }
+
+        return [
+            'name' => $this->name,
+            'description' => $this->description,
+            'inputSchema' => $this->generateInputSchema($className, $target),
+        ];
+    }
+
+    private function generateInputSchema(string $className, string $target): array
+    {
+        $reflection = ReflectionManager::reflectMethod($className, $target);
+        $parameters = $reflection->getParameters();
+        $properties = [];
+
+        foreach ($parameters as $parameter) {
+            $type = $parameter->getType()?->getName() ?? 'string'; // @phpstan-ignore method.notFound
+            $type = match ($type) {
+                'int' => 'integer',
+                'float' => 'number',
+                'bool' => 'boolean',
+                default => $type,
+            };
+            $properties[$parameter->getName()] = [
+                'type' => $type,
+                'description' => self::getDescription($parameter),
+            ];
+        }
+
+        $required = array_filter(
+            array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters)
+        );
+
+        return array_filter([
+            'type' => 'object',
+            'properties' => $properties,
+            'required' => $required,
+            'additionalProperties' => false,
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
+        ]);
     }
 }

@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\MCP\Annotation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Resource
+class Resource extends BaseAnnotation
 {
     public function __construct(
         public string $name = '',
