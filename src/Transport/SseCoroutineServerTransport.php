@@ -11,15 +11,15 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
+use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use Hyperf\Context\RequestContext;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use ModelContextProtocol\SDK\Shared\Transport;
 use Throwable;
 
-class SseCoroutineServerTransport implements Transport
+class SseCoroutineServerTransport implements SseServerTransport
 {
     /**
      * @var callable|null

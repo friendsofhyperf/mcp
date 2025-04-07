@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 /**
- * This file is part of huangdijia/mcp-php-sdk.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/huangdijia/mcp-php-sdk
- * @document https://github.com/huangdijia/mcp-php-sdk/blob/main/README.md
- * @contact  Deeka Wong <huangdijia@gmail.com>
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace FriendsOfHyperf\MCP\Listener;
@@ -46,9 +47,9 @@ class RegisterServerListener implements ListenerInterface
     {
         $servers = $this->config->get('mcp.servers', []);
 
-        foreach ($servers as $server) {
-            $name = $server['name'] ?? '';
-            $serverInfo = Arr::only($server, ['name', 'version', 'description']);
+        foreach ($servers as $options) {
+            $name = $options['name'] ?? '';
+            $serverInfo = Arr::only($options, ['name', 'version', 'description']);
             $this->registry->register($name, $server = new McpServer($serverInfo));
 
             $transport = make(SseServerTransport::class);
@@ -57,8 +58,8 @@ class RegisterServerListener implements ListenerInterface
             $transport->setOnClose(fn () => $server->handleClose());
             $server->connect($transport);
 
-            $serverName = $server['sse']['server'] ?? 'http';
-            $endpoint = $server['sse']['endpoint'] ?? '/sse';
+            $serverName = $options['sse']['server'] ?? 'http';
+            $endpoint = $options['sse']['endpoint'] ?? '/sse';
 
             $this->registerSseRouter($transport, $serverName, $endpoint);
         }
