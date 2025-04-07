@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Annotation;
 
 use Attribute;
+use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use ModelContextProtocol\SDK\Shared\ResourceTemplate;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -29,13 +30,11 @@ class Resource extends BaseAnnotation
 
     public function collectMethod(string $className, ?string $target): void
     {
-        $this->getServerManager()
-            ->get($this->server)
-            ->resource(
-                scheme: $this->scheme,
-                template: $this->buildTemplate($className, $target),
-                handler: [$this->getContainer()->get($className), $target],
-            );
+        ResourceCollector::set($this->server . '.' . $this->scheme, [
+            'className' => $className,
+            'target' => $target,
+            'template' => $this->buildTemplate($className, $target),
+        ]);
     }
 
     private function buildTemplate(string $className, string $target): ResourceTemplate

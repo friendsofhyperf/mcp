@@ -11,8 +11,12 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
+use FriendsOfHyperf\MCP\Collector\PromptCollector;
+use FriendsOfHyperf\MCP\Collector\ResourceCollector;
+use FriendsOfHyperf\MCP\Collector\ToolCollector;
 use Hyperf\Contract\ConfigInterface;
 use ModelContextProtocol\SDK\Server\McpServer;
+use Psr\Container\ContainerInterface;
 use RuntimeException;
 
 class ServerRegistry
@@ -23,12 +27,37 @@ class ServerRegistry
     protected array $servers = [];
 
     public function __construct(
-        protected ConfigInterface $config
+        protected ContainerInterface $container,
+        protected ConfigInterface $config,
     ) {
     }
 
     public function register(string $name, McpServer $server): void
     {
+        foreach ((array) ToolCollector::get($name, []) as $name => $tool) {
+            $server->tool(
+                name: $name,
+                handler: [$this->container->get($tool['className']), $tool['target']],
+                definition: $tool['definition'],
+            );
+        }
+
+        foreach ((array) ResourceCollector::get($name, []) as $scheme => $resource) {
+            $server->resource(
+                scheme: $scheme,
+                handler: [$this->container->get($resource['className']), $resource['target']],
+                template: $resource['template'],
+            );
+        }
+
+        foreach ((array) PromptCollector::get($name, []) as $prompt) {
+            $server->prompt(
+                name: $prompt['name'],
+                handler: [$this->container->get($prompt['className']), $prompt['target']],
+                definition: $prompt['definition'],
+            );
+        }
+
         $this->servers[$name] = $server;
     }
 

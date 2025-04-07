@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Annotation;
 
 use Attribute;
+use FriendsOfHyperf\MCP\Collector\ToolCollector;
 use Hyperf\Di\ReflectionManager;
 use InvalidArgumentException;
 use ReflectionParameter;
@@ -28,13 +29,11 @@ class Tool extends BaseAnnotation
 
     public function collectMethod(string $className, ?string $target): void
     {
-        $this->getServerManager()
-            ->get($this->server)
-            ->tool(
-                name: $this->name,
-                handler: [$this->getContainer()->get($className), $target],
-                definition: $this->buildDefinition($className, $target),
-            );
+        ToolCollector::set($this->server . '.' . $this->name, [
+            'className' => $className,
+            'target' => $target,
+            'definition' => $this->buildDefinition($className, $target),
+        ]);
     }
 
     private function buildDefinition(string $className, string $target): array

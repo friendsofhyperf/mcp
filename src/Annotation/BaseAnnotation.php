@@ -11,10 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Annotation;
 
-use FriendsOfHyperf\MCP\ServerRegistry;
-use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Annotation\AbstractAnnotation;
-use Psr\Container\ContainerInterface;
 use ReflectionParameter;
 
 abstract class BaseAnnotation extends AbstractAnnotation
@@ -28,15 +25,5 @@ abstract class BaseAnnotation extends AbstractAnnotation
         }
 
         return '';
-    }
-
-    protected function getServerManager(): ServerRegistry
-    {
-        return $this->getContainer()->get(ServerRegistry::class);
-    }
-
-    protected function getContainer(): ContainerInterface
-    {
-        return ApplicationContext::getContainer();
     }
 }

@@ -40,6 +40,11 @@
             "ergebnis/composer-normalize": true
         }
     },
+    "extra": {
+        "hyperf": {
+            "config": "FriendsOfHyperf\\MCP\\ConfigProvider"
+        }
+    },
     "scripts": {
         "cs-fix": "php-cs-fixer fix $1",
         "analyse": "phpstan analyse --memory-limit 300M -l 5 $1",
