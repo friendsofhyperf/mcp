@@ -57,7 +57,7 @@ class StdioServerTransport implements Transport
     public function send(string $message): void
     {
         if ($this->active) {
-            $this->output->write($message);
+            $this->output->writeln($message);
         }
     }
 
