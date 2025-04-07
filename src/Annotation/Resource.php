@@ -18,7 +18,7 @@ use ModelContextProtocol\SDK\Shared\ResourceTemplate;
 class Resource extends BaseAnnotation
 {
     public function __construct(
-        public string $schema = '',
+        public string $scheme = '',
         public string $uri = '',
         public string $name = '',
         public string $description = '',
@@ -32,7 +32,7 @@ class Resource extends BaseAnnotation
         $this->getServerManager()
             ->getServer($this->server)
             ->resource(
-                scheme: $this->schema,
+                scheme: $this->scheme,
                 template: $this->buildTemplate($className, $target),
                 handler: [$this->getContainer()->get($className), $target],
             );
