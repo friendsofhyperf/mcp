@@ -56,8 +56,6 @@ class MCPCommand extends Command
                     $transport->handleError($e);
                 }
             }
-
-            usleep(10000); // 10ms
         }
     }
 }
