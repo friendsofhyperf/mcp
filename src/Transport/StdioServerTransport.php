@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of huangdijia/mcp-php-sdk.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://github.com/huangdijia/mcp-php-sdk
+ * @document https://github.com/huangdijia/mcp-php-sdk/blob/main/README.md
+ * @contact  Deeka Wong <huangdijia@gmail.com>
  */
 
 namespace FriendsOfHyperf\MCP\Transport;
@@ -25,17 +24,17 @@ class StdioServerTransport implements Transport
     private bool $active = false;
 
     /**
-     * @var null|callable callback for when a message is received
+     * @var callable|null callback for when a message is received
      */
     private $onMessage;
 
     /**
-     * @var null|callable callback for when the connection is closed
+     * @var callable|null callback for when the connection is closed
      */
     private $onClose;
 
     /**
-     * @var null|callable callback for when an error occurs
+     * @var callable|null callback for when an error occurs
      */
     private $onError;
 
@@ -76,21 +75,21 @@ class StdioServerTransport implements Transport
     public function handleMessage(string $message): void
     {
         if ($this->onMessage) {
-            ($this->onMessage)($message);
+            call_user_func($this->onMessage, $message);
         }
     }
 
     public function handleError(Throwable $error): void
     {
         if ($this->onError) {
-            ($this->onError)($error);
+            call_user_func($this->onError, $error);
         }
     }
 
     public function handleClose(): void
     {
         if ($this->onClose) {
-            ($this->onClose)();
+            call_user_func($this->onClose);
         }
     }
 }
