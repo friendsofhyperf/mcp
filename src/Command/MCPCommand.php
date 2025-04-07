@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Command;
 
 use FriendsOfHyperf\MCP\ServerManager;
-use ModelContextProtocol\SDK\Server\Transport\StdioServerTransport;
+use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
 
 use function Hyperf\Support\make;
 
