@@ -14,8 +14,6 @@ namespace FriendsOfHyperf\MCP\Command;
 use FriendsOfHyperf\MCP\ServerManager;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
 
-use function Hyperf\Support\make;
-
 class MCPCommand extends \Hyperf\Command\Command
 {
     protected ?string $signature = 'mcp:run {--name= : The name of the mcp server.}';
@@ -24,14 +22,14 @@ class MCPCommand extends \Hyperf\Command\Command
 
     public function __construct(
         protected ServerManager $serverManager,
+        protected StdioServerTransport $transport
     ) {
     }
 
     public function handle(): void
     {
         $server = $this->serverManager->getServer($this->input->getOption('name'));
-        $transport = make(StdioServerTransport::class);
-        $server->connect($transport);
+        $server->connect($this->transport);
 
         $input = STDIN;
         stream_set_blocking($input, false);
@@ -40,7 +38,7 @@ class MCPCommand extends \Hyperf\Command\Command
             $line = fgets($input);
 
             if ($line !== false && trim($line) !== '') {
-                $transport->handleMessage(trim($line));
+                $this->transport->handleMessage(trim($line));
             }
 
             usleep(10000); // 10ms
