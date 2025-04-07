@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
-use FriendsOfHyperf\MCP\Exception\Handler\McpSseExceptionHandler;
 use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Server;
