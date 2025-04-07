@@ -14,6 +14,7 @@ namespace FriendsOfHyperf\MCP\Annotation;
 use FriendsOfHyperf\MCP\ServerManager;
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Di\Annotation\AbstractAnnotation;
+use Psr\Container\ContainerInterface;
 use ReflectionParameter;
 
 abstract class BaseAnnotation extends AbstractAnnotation
@@ -34,7 +35,7 @@ abstract class BaseAnnotation extends AbstractAnnotation
         return $this->getContainer()->get(ServerManager::class);
     }
 
-    protected function getContainer(): \Psr\Container\ContainerInterface
+    protected function getContainer(): ContainerInterface
     {
         return ApplicationContext::getContainer();
     }
