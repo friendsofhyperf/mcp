@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Listener;
 
+use Exception;
 use FriendsOfHyperf\MCP\ServerManager;
 use FriendsOfHyperf\MCP\Transport\SseServerTransport;
 use Hyperf\Contract\ConfigInterface;
@@ -55,7 +56,11 @@ class RegisterServerListener implements ListenerInterface
                     $transport->start($route);
                 });
                 Router::post($route, function (RequestInterface $request) use ($transport) {
-                    return $transport->handleMessage($request->getBody()->getContents());
+                    try {
+                        return $transport->handleMessage($request->getBody()->getContents());
+                    } catch (Exception $e) {
+                        return $transport->handleError($e);
+                    }
                 });
             });
         }

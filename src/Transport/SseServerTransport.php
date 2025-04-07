@@ -16,6 +16,7 @@ use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Shared\Transport;
+use Throwable;
 
 class SseServerTransport implements Transport
 {
@@ -42,6 +43,20 @@ class SseServerTransport implements Transport
     {
         if ($this->onMessage) {
             call_user_func($this->onMessage, $message);
+        }
+    }
+
+    public function handleError(Throwable $error): void
+    {
+        if ($this->onError) {
+            call_user_func($this->onError, $error);
+        }
+    }
+
+    public function handleClose(): void
+    {
+        if ($this->onClose) {
+            call_user_func($this->onClose);
         }
     }
 
