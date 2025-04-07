@@ -22,4 +22,18 @@ class Prompt extends BaseAnnotation
         public string $server = '',
     ) {
     }
+
+    public function collectMethod(string $className, ?string $target): void
+    {
+        $this->getServerManager()
+            ->getServer($this->server)
+            ->prompt(
+                name: $this->name,
+                handler: [$this->getContainer()->get($className), $target],
+                definition: [
+                    'description' => $this->description,
+                    'arguments' => [], // @TODO build arguments
+                ],
+            );
+    }
 }
