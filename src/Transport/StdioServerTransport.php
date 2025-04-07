@@ -48,6 +48,10 @@ class StdioServerTransport implements Transport
     public function close(): void
     {
         $this->active = false;
+
+        if ($this->onClose) {
+            call_user_func($this->onClose);
+        }
     }
 
     public function send(string $message): void
