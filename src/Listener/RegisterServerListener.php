@@ -49,7 +49,7 @@ class RegisterServerListener implements ListenerInterface
         foreach ($servers as $server) {
             $name = $server['name'] ?? '';
             $serverInfo = Arr::only($server, ['name', 'version', 'description']);
-            $this->registry->register($name, $server = make(McpServer::class, $serverInfo));
+            $this->registry->register($name, $server = new McpServer($serverInfo));
 
             $transport = make(SseServerTransport::class);
             $transport->setOnMessage(fn ($message) => $server->handleMessage($message));
@@ -60,23 +60,31 @@ class RegisterServerListener implements ListenerInterface
             $serverName = $server['sse']['server'] ?? 'http';
             $endpoint = $server['sse']['endpoint'] ?? '/sse';
 
-            Router::addServer($serverName, function () use ($transport, $endpoint) {
-                Router::addRoute(
-                    ['GET', 'POST'],
-                    $endpoint,
-                    function (RequestInterface $request) use ($transport, $endpoint) {
-                        try {
-                            match ($request->getMethod()) {
-                                'GET' => $transport->start($endpoint),
-                                'POST' => $transport->handleMessage($request->getBody()->getContents()),
-                                default => throw new RuntimeException('Method not allowed'),
-                            };
-                        } catch (Throwable $e) {
-                            $transport->handleError($e);
-                        }
-                    }
-                );
-            });
+            $this->registerSseRouter($transport, $serverName, $endpoint);
         }
+    }
+
+    protected function registerSseRouter(
+        SseServerTransport $transport,
+        string $serverName,
+        string $endpoint
+    ): void {
+        Router::addServer($serverName, function () use ($transport, $endpoint) {
+            Router::addRoute(
+                ['GET', 'POST'],
+                $endpoint,
+                function (RequestInterface $request) use ($transport, $endpoint) {
+                    try {
+                        match ($request->getMethod()) {
+                            'GET' => $transport->start($endpoint),
+                            'POST' => $transport->handleMessage($request->getBody()->getContents()),
+                            default => throw new RuntimeException('Method not allowed'),
+                        };
+                    } catch (Throwable $e) {
+                        $transport->handleError($e);
+                    }
+                }
+            );
+        });
     }
 }
