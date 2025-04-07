@@ -49,7 +49,7 @@ class RegisterServerListener implements ListenerInterface
 
             Router::addServer($server['sse']['server'], function () use ($server, $transport) {
                 Router::get($route = $server['sse']['route'] ?? '/', function () use ($transport, $route) {
-                    return $transport->start($route);
+                    $transport->start($route);
                 });
                 Router::post($route, function (RequestInterface $request) use ($transport) {
                     return $transport->handleMessage($request->getBody()->getContents());

@@ -11,10 +11,18 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
+use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Shared\Transport;
 
 class SseServerTransport implements Transport
 {
+    public function __construct(
+        protected RequestInterface $request,
+        protected ResponseInterface $response,
+    ) {
+    }
+
     public function start(string $route): void
     {
     }

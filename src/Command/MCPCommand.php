@@ -30,11 +30,6 @@ class MCPCommand extends \Hyperf\Command\Command
     public function handle(): void
     {
         $server = $this->serverManager->getServer($this->input->getOption('name'));
-        if (! $server) {
-            $this->error('Server not found.');
-            return;
-        }
-
         $transport = make(StdioServerTransport::class);
         $server->connect($transport);
 
