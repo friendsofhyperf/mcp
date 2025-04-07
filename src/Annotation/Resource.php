@@ -19,7 +19,7 @@ class Resource extends BaseAnnotation
 {
     public function __construct(
         public string $schema = '',
-        public string $template = '',
+        public string $uri = '',
         public string $name = '',
         public string $description = '',
         public string $mimeType = 'text/plain',
@@ -41,7 +41,7 @@ class Resource extends BaseAnnotation
     private function buildTemplate(string $className, string $target): ResourceTemplate
     {
         return new ResourceTemplate(
-            template: $this->template,
+            template: $this->uri,
             options: [
                 'name' => $this->name,
                 'description' => $this->description,
