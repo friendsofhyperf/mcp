@@ -9,17 +9,20 @@ declare(strict_types=1);
  * @contact  Deeka Wong <huangdijia@gmail.com>
  */
 return [
-    'demo' => [
-        'name' => 'demo',
-        'description' => 'This is a demo route',
-        // The route of the sse server
-        'sse' => [
-            'server' => 'http',
-            'route' => '/sse',
-        ],
-        // Bind the name of the command
-        'stdio' => [
-            'command' => 'mcp:demo',
+    'servers' => [
+        [
+            'name' => 'demo',
+            'version' => '1.0.0',
+            'description' => 'This is a demo route',
+            // The route of the sse server
+            'sse' => [
+                'server' => 'http',
+                'route' => '/sse',
+            ],
+            // Bind the name of the command
+            'stdio' => [
+                'command' => 'mcp:demo',
+            ],
         ],
     ],
 ];

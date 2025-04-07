@@ -11,6 +11,28 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
+use Hyperf\Collection\Arr;
+use Hyperf\Contract\ConfigInterface;
+use ModelContextProtocol\SDK\Server\McpServer;
+use RuntimeException;
+
 class ServerManager
 {
+    public function __construct(
+        protected ConfigInterface $config
+    ) {
+    }
+
+    public function getServer(string $name): McpServer
+    {
+        $servers = $this->config->get('mcp.servers', []);
+
+        if (! isset($servers[$name])) {
+            throw new RuntimeException(sprintf('Server %s not found.', $name));
+        }
+
+        $serverConfig = Arr::only($servers[$name] ?? [], ['name', 'version', 'description']);
+
+        return new McpServer($serverConfig);
+    }
 }
