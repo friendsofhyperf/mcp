@@ -19,10 +19,6 @@ return [
                 'server' => 'http',
                 'route' => '/sse',
             ],
-            // Bind the name of the command
-            'stdio' => [
-                'command' => 'mcp:demo',
-            ],
         ],
     ],
 ];
