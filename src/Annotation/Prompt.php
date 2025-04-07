@@ -36,6 +36,9 @@ class Prompt extends BaseAnnotation
             );
     }
 
+    /**
+     * @return array{name:string,description?:string,arguments:array{name:string,description?:string,required?:bool,}[]}
+     */
     private function buildDefinition(string $className, string $target): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
