@@ -51,7 +51,7 @@ class RegisterServerListener implements ListenerInterface
             $transport->setOnClose(fn () => $server->handleClose());
             $server->connect($transport);
 
-            Router::addServer($server['sse']['server'], function () use ($server, $transport) {
+            Router::addServer($server['sse']['server'] ?? 'http', function () use ($server, $transport) {
                 Router::get($route = $server['sse']['route'] ?? '/', function () use ($transport, $route) {
                     $transport->start($route);
                 });
