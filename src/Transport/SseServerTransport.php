@@ -41,11 +41,6 @@ class SseServerTransport implements Transport
      */
     private array $connections = [];
 
-    /**
-     * @var array<string, int>
-     */
-    private array $fdMapping = [];
-
     public function __construct(
         protected RequestInterface $request,
         protected ResponseInterface $response,
@@ -60,16 +55,12 @@ class SseServerTransport implements Transport
         $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$route}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
-        $this->connections[$fd] = $eventStream;
-        $this->fdMapping[$sessionId] = $fd;
+        $this->connections[$sessionId] = $eventStream;
 
         CoordinatorManager::until("mcp:fd:{$fd}")->yield();
 
-        if (isset($this->connections[$fd])) {
-            unset($this->connections[$fd]);
-        }
-        if (isset($this->fdMapping[$sessionId])) {
-            unset($this->fdMapping[$sessionId]);
+        if (isset($this->connections[$sessionId])) {
+            unset($this->connections[$sessionId]);
         }
     }
 
@@ -98,15 +89,11 @@ class SseServerTransport implements Transport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if (! $fd = $this->fdMapping[$sessionId] ?? null) {
+        if (! isset($this->connections[$sessionId])) {
             return;
         }
 
-        if (! isset($this->connections[$fd])) {
-            return;
-        }
-
-        $this->connections[$fd]->write("event: message\ndata: {$message}\n\n");
+        $this->connections[$sessionId]->write("event: message\ndata: {$message}\n\n");
     }
 
     public function close(): void
