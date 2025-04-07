@@ -57,9 +57,9 @@ class RegisterServerListener implements ListenerInterface
                 });
                 Router::post($route, function (RequestInterface $request) use ($transport) {
                     try {
-                        return $transport->handleMessage($request->getBody()->getContents());
+                        $transport->handleMessage($request->getBody()->getContents());
                     } catch (Exception $e) {
-                        return $transport->handleError($e);
+                        $transport->handleError($e);
                     }
                 });
             });
