@@ -64,7 +64,6 @@ class ServerRegistry
 
     public function get(string $name): McpServer
     {
-        var_dump($name, array_keys($this->servers));
         if (! isset($this->servers[$name])) {
             throw new RuntimeException(sprintf('Server %s not found.', $name));
         }
