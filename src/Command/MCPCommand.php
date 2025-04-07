@@ -13,6 +13,7 @@ namespace FriendsOfHyperf\MCP\Command;
 
 use FriendsOfHyperf\MCP\ServerManager;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
+use Throwable;
 
 use function Hyperf\Support\make;
 
@@ -43,7 +44,11 @@ class MCPCommand extends \Hyperf\Command\Command
             $line = fgets($input);
 
             if ($line !== false && trim($line) !== '') {
-                $transport->handleMessage(trim($line));
+                try {
+                    $transport->handleMessage(trim($line));
+                } catch (Throwable $e) {
+                    $transport->handleError($e);
+                }
             }
 
             usleep(10000); // 10ms
