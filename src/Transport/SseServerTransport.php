@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
+use Hyperf\Context\RequestContext;
+use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Shared\Transport;
@@ -25,6 +27,9 @@ class SseServerTransport implements Transport
 
     public function start(string $route): void
     {
+        $fd = RequestContext::get()->getSwooleRequest()->fd; // @phpstan-ignore-line
+
+        CoordinatorManager::until("mcp:fd:{$fd}")->yield();
     }
 
     public function handleMessage(string $message): void
