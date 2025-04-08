@@ -37,9 +37,15 @@ class ServerRegistry
             $serverName = $name;
 
             foreach ((array) ToolCollector::get($serverName, []) as $name => $tool) {
+                $handler = function (array $params) use ($tool) {
+                    return call_user_func(
+                        [$this->container->get($tool['className']), $tool['target']],
+                        ...$params,
+                    );
+                };
                 $server->tool(
                     name: $name,
-                    handler: [$this->container->get($tool['className']), $tool['target']],
+                    handler: $handler,
                     definition: $tool['definition'],
                 );
             }
