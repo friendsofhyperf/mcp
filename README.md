@@ -70,7 +70,7 @@ class FileController
     #[Tool(name: 'read_file', description: '读取文件内容', server: 'demo')]
     public function readFile(string $path): string
     {
-        return file_get_contents($path);
+        return ['toolResult' => file_get_contents($path)];
     }
 
     #[Tool(name: 'write_file', description: '写入文件内容', server: 'demo')]
