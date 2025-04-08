@@ -59,9 +59,15 @@ class ServerRegistry
             }
 
             foreach ((array) PromptCollector::get($serverName, []) as $prompt) {
+                $handler = function (array $arguments) use ($prompt) {
+                    return call_user_func(
+                        [$this->container->get($prompt['className']), $prompt['target']],
+                        ...$arguments,
+                    );
+                };
                 $server->prompt(
                     name: $prompt['name'],
-                    handler: [$this->container->get($prompt['className']), $prompt['target']],
+                    handler: $handler,
                     definition: $prompt['definition'],
                 );
             }
