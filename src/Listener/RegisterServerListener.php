@@ -51,21 +51,22 @@ class RegisterServerListener implements ListenerInterface
             $serverInfo = Arr::only($options, ['name', 'version', 'description']);
             $this->registry->register($name, $server = new McpServer($serverInfo));
 
+            if (! isset($options['sse']['server'], $options['sse']['endpoint'])) {
+                continue;
+            }
+
             $transport = make(SseServerTransport::class);
             $server->connect($transport);
 
-            $serverName = $options['sse']['server'] ?? 'http';
-            $endpoint = $options['sse']['endpoint'] ?? '/sse';
+            $serverName = $options['sse']['server'];
+            $endpoint = $options['sse']['endpoint'];
 
             $this->registerSseRouter($transport, $serverName, $endpoint);
         }
     }
 
-    protected function registerSseRouter(
-        SseServerTransport $transport,
-        string $serverName,
-        string $endpoint
-    ): void {
+    protected function registerSseRouter(SseServerTransport $transport, string $serverName, string $endpoint): void
+    {
         Router::addServer($serverName, function () use ($transport, $endpoint) {
             Router::addRoute(
                 ['GET', 'POST'],
