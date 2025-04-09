@@ -11,9 +11,11 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Command;
 
+use Exception;
 use FriendsOfHyperf\MCP\ServerRegistry;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
 use Hyperf\Command\Command;
+use Symfony\Component\Console\Exception\MissingInputException;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Throwable;
@@ -47,14 +49,16 @@ class MCPCommand extends Command
         $server->connect($transport);
 
         while (true) { // @phpstan-ignore-line
-            $line = $this->helper->ask($this->input, $this->output, new Question(''));
-
-            if ($line !== false && trim($line) !== '') {
-                try {
+            try {
+                $line = $this->helper->ask($this->input, $this->output, new Question(''));
+                if ($line !== false && trim($line) !== '') {
                     $transport->handleMessage(trim($line));
-                } catch (Throwable $e) {
-                    $transport->handleError($e);
                 }
+            } catch (MissingInputException $e) {
+                // Ignore the exception when the input is empty
+                continue;
+            } catch (Throwable $e) {
+                $transport->handleError($e);
             }
         }
     }
