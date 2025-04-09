@@ -19,6 +19,10 @@ return [
                 'server' => 'http',
                 'endpoint' => '/sse',
             ],
+            'options' => [
+                'logger' => null,
+                'enforceStrictCapabilities' => false,
+            ],
         ],
     ],
 ];

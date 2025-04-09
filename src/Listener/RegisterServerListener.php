@@ -49,7 +49,11 @@ class RegisterServerListener implements ListenerInterface
         foreach ($servers as $options) {
             $name = $options['name'] ?? '';
             $serverInfo = Arr::only($options, ['name', 'version', 'description']);
-            $this->registry->register($name, $server = new McpServer($serverInfo));
+            $serverOptions = Arr::only($options['options'] ?? [], ['logger', 'enforceStrictCapabilities']);
+            $this->registry->register(
+                $name,
+                $server = new McpServer($serverInfo, $serverOptions)
+            );
 
             if (! isset($options['sse']['server'], $options['sse']['endpoint'])) {
                 continue;
