@@ -22,6 +22,11 @@ abstract class BaseAnnotation extends AbstractAnnotation
 
     abstract public function toDefinition(): array;
 
+    public function collectClass(string $className): void
+    {
+        static::collectMethod($className, '__invoke');
+    }
+
     protected static function getDescription(ReflectionParameter $parameter): string
     {
         foreach ($parameter->getAttributes() as $attribute) {
