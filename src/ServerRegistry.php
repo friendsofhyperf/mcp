@@ -36,7 +36,7 @@ class ServerRegistry
 
     public function register(string $name, McpServer $server): void
     {
-        $this->servers[$name] = tap($server, function ($server) use ($name) {
+        $this->servers[$name] = tap($server, function (McpServer $server) use ($name) {
             $serverName = $name;
 
             foreach ((array) ToolCollector::get($serverName, []) as $tool) {
