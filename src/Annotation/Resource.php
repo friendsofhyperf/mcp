@@ -38,13 +38,7 @@ class Resource extends BaseAnnotation
 
     public function toDefinition(): array
     {
-        return [
-            'scheme' => $this->scheme,
-            'uri' => $this->uri,
-            'name' => $this->name,
-            'description' => $this->description,
-            'mimeType' => $this->mimeType,
-        ];
+        return [];
     }
 
     public function toTemplate(): ResourceTemplate

@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
+use FriendsOfHyperf\MCP\Annotation\Prompt;
+use FriendsOfHyperf\MCP\Annotation\Resource;
+use FriendsOfHyperf\MCP\Annotation\Tool;
 use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use FriendsOfHyperf\MCP\Collector\ToolCollector;
@@ -36,7 +39,8 @@ class ServerRegistry
         $this->servers[$name] = tap($server, function ($server) use ($name) {
             $serverName = $name;
 
-            foreach ((array) ToolCollector::get($serverName, []) as $name => $tool) {
+            foreach ((array) ToolCollector::get($serverName, []) as $tool) {
+                /** @var Tool $tool */
                 $handler = function (array $params) use ($tool) {
                     return call_user_func(
                         [$this->container->get($tool->className), $tool->target],
@@ -50,18 +54,20 @@ class ServerRegistry
                 );
             }
 
-            foreach ((array) ResourceCollector::get($serverName, []) as $scheme => $resource) {
+            foreach ((array) ResourceCollector::get($serverName, []) as $resource) {
+                /* @var Resource $resource */
                 $server->resource(
-                    scheme: $scheme,
+                    scheme: $resource->scheme,
                     handler: [$this->container->get($resource->className), $resource->target],
                     template: $resource->toTemplate(),
                 );
             }
 
             foreach ((array) PromptCollector::get($serverName, []) as $prompt) {
+                /** @var Prompt $prompt */
                 $handler = function (array $arguments) use ($prompt) {
                     return call_user_func(
-                        [$this->container->get($prompt['className']), $prompt['target']],
+                        [$this->container->get($prompt->className), $prompt->target],
                         ...$arguments,
                     );
                 };
