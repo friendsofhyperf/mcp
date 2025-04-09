@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Transport;
 
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
+use Hyperf\Context\Context;
 use Hyperf\Context\RequestContext;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
@@ -55,6 +56,8 @@ class SseCoroutineServerTransport implements SseServerTransport
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
+
+        Context::set('mcp.sse.transport', $this);
 
         CoordinatorManager::until("mcp-sse:fd:{$fd}")->yield();
 
