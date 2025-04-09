@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP;
 
+use FriendsOfHyperf\MCP\Exception\Handler\McpSseExceptionHandler;
 use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Server;
@@ -20,5 +21,12 @@ class McpServer extends Server implements OnCloseInterface
     public function onClose($server, int $fd, int $reactorId): void
     {
         CoordinatorManager::until("mcp-sse:fd:{$fd}")->resume();
+    }
+
+    protected function getDefaultExceptionHandler(): array
+    {
+        return [
+            McpSseExceptionHandler::class,
+        ];
     }
 }
