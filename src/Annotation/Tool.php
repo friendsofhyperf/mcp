@@ -17,7 +17,7 @@ use Hyperf\Di\ReflectionManager;
 use InvalidArgumentException;
 use ReflectionParameter;
 
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Tool extends BaseAnnotation
 {
     public function __construct(

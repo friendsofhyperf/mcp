@@ -15,7 +15,7 @@ use Attribute;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use ModelContextProtocol\SDK\Shared\ResourceTemplate;
 
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Resource extends BaseAnnotation
 {
     public function __construct(

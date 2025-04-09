@@ -16,7 +16,7 @@ use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use Hyperf\Di\ReflectionManager;
 use InvalidArgumentException;
 
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Prompt extends BaseAnnotation
 {
     public function __construct(
