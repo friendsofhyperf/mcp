@@ -16,6 +16,12 @@ use ReflectionParameter;
 
 abstract class BaseAnnotation extends AbstractAnnotation
 {
+    public ?string $className = null;
+
+    public ?string $target = null;
+
+    abstract public function toDefinition(): array;
+
     protected static function getDescription(ReflectionParameter $parameter): string
     {
         foreach ($parameter->getAttributes() as $attribute) {

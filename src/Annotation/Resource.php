@@ -30,14 +30,24 @@ class Resource extends BaseAnnotation
 
     public function collectMethod(string $className, ?string $target): void
     {
-        ResourceCollector::set($this->server . '.' . $this->scheme, [
-            'className' => $className,
-            'target' => $target,
-            'template' => $this->buildTemplate($className, $target),
-        ]);
+        $this->className = $className;
+        $this->target = $target;
+
+        ResourceCollector::set($this->server . '.' . $this->scheme, $this);
     }
 
-    private function buildTemplate(string $className, string $target): ResourceTemplate
+    public function toDefinition(): array
+    {
+        return [
+            'scheme' => $this->scheme,
+            'uri' => $this->uri,
+            'name' => $this->name,
+            'description' => $this->description,
+            'mimeType' => $this->mimeType,
+        ];
+    }
+
+    public function toTemplate(): ResourceTemplate
     {
         return new ResourceTemplate(
             template: $this->uri,

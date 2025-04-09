@@ -28,14 +28,13 @@ class Prompt extends BaseAnnotation
 
     public function collectMethod(string $className, ?string $target): void
     {
-        PromptCollector::set($this->server . '.' . $this->name, [
-            'className' => $className,
-            'target' => $target,
-            'definition' => $this->buildDefinition($className, $target),
-        ]);
+        $this->className = $className;
+        $this->target = $target;
+
+        PromptCollector::set($this->server . '.' . $this->name, $this);
     }
 
-    private function buildDefinition(string $className, string $target): array
+    public function toDefinition(): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
             throw new InvalidArgumentException('Prompt name must be alphanumeric and underscores.');
@@ -44,7 +43,7 @@ class Prompt extends BaseAnnotation
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'arguments' => $this->buildArguments($className, $target),
+            'arguments' => $this->buildArguments($this->className, $this->target),
         ];
     }
 

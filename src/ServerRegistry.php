@@ -39,22 +39,22 @@ class ServerRegistry
             foreach ((array) ToolCollector::get($serverName, []) as $name => $tool) {
                 $handler = function (array $params) use ($tool) {
                     return call_user_func(
-                        [$this->container->get($tool['className']), $tool['target']],
+                        [$this->container->get($tool->className), $tool->target],
                         ...$params,
                     );
                 };
                 $server->tool(
-                    name: $name,
+                    name: $tool->name,
                     handler: $handler,
-                    definition: $tool['definition'],
+                    definition: $tool->toDefinition(),
                 );
             }
 
             foreach ((array) ResourceCollector::get($serverName, []) as $scheme => $resource) {
                 $server->resource(
                     scheme: $scheme,
-                    handler: [$this->container->get($resource['className']), $resource['target']],
-                    template: $resource['template'],
+                    handler: [$this->container->get($resource->className), $resource->target],
+                    template: $resource->toTemplate(),
                 );
             }
 
@@ -66,9 +66,9 @@ class ServerRegistry
                     );
                 };
                 $server->prompt(
-                    name: $prompt['name'],
+                    name: $prompt->name,
                     handler: $handler,
-                    definition: $prompt['definition'],
+                    definition: $prompt->toDefinition(),
                 );
             }
         });
