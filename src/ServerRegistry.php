@@ -50,7 +50,7 @@ class ServerRegistry
                 $server->tool(
                     name: $tool->name,
                     handler: $handler,
-                    definition: $tool->toDefinition(),
+                    definition: $tool->definition,
                 );
             }
 
@@ -59,7 +59,7 @@ class ServerRegistry
                 $server->resource(
                     scheme: $resource->scheme,
                     handler: [$this->container->get($resource->className), $resource->target],
-                    template: $resource->toTemplate(),
+                    template: $resource->template,
                 );
             }
 
@@ -74,7 +74,7 @@ class ServerRegistry
                 $server->prompt(
                     name: $prompt->name,
                     handler: $handler,
-                    definition: $prompt->toDefinition(),
+                    definition: $prompt->definition,
                 );
             }
         });

@@ -18,6 +18,8 @@ use ModelContextProtocol\SDK\Shared\ResourceTemplate;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Resource extends BaseAnnotation
 {
+    public ?ResourceTemplate $template = null;
+
     public function __construct(
         public string $scheme = '',
         public string $uri = '',
@@ -32,16 +34,12 @@ class Resource extends BaseAnnotation
     {
         $this->className = $className;
         $this->target = $target;
+        $this->template = $this->toTemplate();
 
         ResourceCollector::set($this->server . '.' . $this->scheme, $this);
     }
 
-    public function toDefinition(): array
-    {
-        return [];
-    }
-
-    public function toTemplate(): ResourceTemplate
+    private function toTemplate(): ResourceTemplate
     {
         return new ResourceTemplate(
             template: $this->uri,

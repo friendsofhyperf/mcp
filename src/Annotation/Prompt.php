@@ -30,11 +30,12 @@ class Prompt extends BaseAnnotation
     {
         $this->className = $className;
         $this->target = $target;
+        $this->definition = $this->toDefinition();
 
         PromptCollector::set($this->server . '.' . $this->name, $this);
     }
 
-    public function toDefinition(): array
+    private function toDefinition(): array
     {
         if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
             throw new InvalidArgumentException('Prompt name must be alphanumeric and underscores.');

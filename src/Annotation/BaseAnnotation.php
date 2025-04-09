@@ -20,7 +20,7 @@ abstract class BaseAnnotation extends AbstractAnnotation
 
     public ?string $target = null;
 
-    abstract public function toDefinition(): array;
+    public ?array $definition = null;
 
     public function collectClass(string $className): void
     {
