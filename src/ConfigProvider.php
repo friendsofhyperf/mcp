@@ -31,6 +31,7 @@ class ConfigProvider
             ],
             'dependencies' => [
                 Contract\IdGenerator::class => Generator\IdGenerator::class,
+                Contract\SessionIdGenerator::class => Generator\SessionIdGenerator::class,
                 SseServerTransport::class => SseCoroutineServerTransport::class,
             ],
             'listeners' => [
