@@ -24,7 +24,8 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
 {
     public function __construct(
         protected ContainerInterface $container,
-        protected Redis $redis
+        protected Redis $redis,
+        protected string $prefix = '',
     ) {
         parent::__construct(
             $container->get(RequestInterface::class),
@@ -37,8 +38,8 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
     public function start(string $endpoint): void
     {
         co(function () {
-            $this->redis->psubscribe(['mcp.sse.*'], function ($redis, $pattern, $channel, $message) {
-                $sessionId = (string) substr($channel, strlen('mcp.sse.'));
+            $this->redis->psubscribe(["{$this->prefix}mcp.sse.*"], function ($redis, $pattern, $channel, $message) {
+                $sessionId = (string) substr($channel, strlen("{$this->prefix}mcp.sse."));
                 if (isset($this->connections[$sessionId])) {
                     $this->connections[$sessionId]->write("event: message\ndata: {$message}\n\n");
                 }
@@ -56,6 +57,6 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
             return;
         }
 
-        $this->redis->publish("mcp.sse.{$sessionId}", $message);
+        $this->redis->publish("{$this->prefix}mcp.sse.{$sessionId}", $message);
     }
 }
