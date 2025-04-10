@@ -15,9 +15,7 @@ use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use FriendsOfHyperf\MCP\Collector\ToolCollector;
 use FriendsOfHyperf\MCP\Command\MCPCommand;
-use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use FriendsOfHyperf\MCP\Listener\RegisterServerListener;
-use FriendsOfHyperf\MCP\Transport\SseCoroutineServerTransport;
 
 defined('BASE_PATH') or define('BASE_PATH', dirname(__DIR__));
 
@@ -32,7 +30,7 @@ class ConfigProvider
             'dependencies' => [
                 Contract\IdGenerator::class => Generator\IdGenerator::class,
                 Contract\SessionIdGenerator::class => Generator\SessionIdGenerator::class,
-                SseServerTransport::class => SseCoroutineServerTransport::class,
+                Contract\SseServerTransport::class => Transport\SseCoroutineServerTransport::class,
             ],
             'listeners' => [
                 RegisterServerListener::class,
