@@ -13,34 +13,17 @@ namespace FriendsOfHyperf\MCP\Transport;
 
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
-use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Types;
-use Throwable;
 
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
-class CoroutineSseServerTransport implements SseServerTransport
+class CoroutineSseServerTransport extends Transport
 {
-    /**
-     * @var callable|null
-     */
-    protected $onClose;
-
-    /**
-     * @var callable|null
-     */
-    protected $onMessage;
-
-    /**
-     * @var callable|null
-     */
-    protected $onError;
-
     /**
      * @var array<int, EventStream>
      */
@@ -86,27 +69,6 @@ class CoroutineSseServerTransport implements SseServerTransport
         $this->close();
     }
 
-    public function handleMessage(string $message): void
-    {
-        if ($this->onMessage) {
-            call_user_func($this->onMessage, $message);
-        }
-    }
-
-    public function handleError(Throwable $error): void
-    {
-        if ($this->onError) {
-            call_user_func($this->onError, $error);
-        }
-    }
-
-    public function handleClose(): void
-    {
-        if ($this->onClose) {
-            call_user_func($this->onClose);
-        }
-    }
-
     public function send(string $message): void
     {
         $sessionId = (string) $this->request->input('sessionId');
@@ -121,20 +83,5 @@ class CoroutineSseServerTransport implements SseServerTransport
     public function close(): void
     {
         $this->handleClose();
-    }
-
-    public function setOnMessage(callable $callback): void
-    {
-        $this->onMessage = $callback;
-    }
-
-    public function setOnClose(callable $callback): void
-    {
-        $this->onClose = $callback;
-    }
-
-    public function setOnError(callable $callback): void
-    {
-        $this->onError = $callback;
     }
 }

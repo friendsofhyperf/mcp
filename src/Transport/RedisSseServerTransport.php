@@ -39,7 +39,7 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
     public function start(string $endpoint): void
     {
         co(function () {
-            while (true) {
+            while (true) { // @phpstan-ignore-line
                 $this->redis->ping();
                 msleep(1000);
             }
