@@ -11,13 +11,13 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
+use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Types;
-use stdClass;
 use Throwable;
 
 use function Hyperf\Coroutine\co;
@@ -48,6 +48,7 @@ class SseCoroutineServerTransport implements SseServerTransport
     public function __construct(
         protected RequestInterface $request,
         protected ResponseInterface $response,
+        protected IdGenerator $idGenerator,
     ) {
     }
 
@@ -63,8 +64,8 @@ class SseCoroutineServerTransport implements SseServerTransport
         co(function () use ($sessionId, $psr7Response) {
             $ping = json_encode([
                 'jsonrpc' => Types::JSONRPC_VERSION,
-                'id' => 0,
-                'result' => new stdClass(),
+                'id' => $this->idGenerator->generate(),
+                'method' => 'ping',
             ]);
             while ($psr7Response->write($ping)) {
                 msleep(1000);
