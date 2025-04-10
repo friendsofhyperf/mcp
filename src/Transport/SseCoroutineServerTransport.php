@@ -16,6 +16,8 @@ use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use ModelContextProtocol\SDK\Types;
+use stdClass;
 use Throwable;
 
 use function Hyperf\Coroutine\co;
@@ -59,13 +61,16 @@ class SseCoroutineServerTransport implements SseServerTransport
         $this->connections[$sessionId] = $eventStream;
 
         co(function () use ($sessionId, $psr7Response) {
-            while ($psr7Response->write('{}')) {
+            $ping = json_encode([
+                'jsonrpc' => Types::JSONRPC_VERSION,
+                'id' => 0,
+                'result' => new stdClass(),
+            ]);
+            while ($psr7Response->write($ping)) {
                 msleep(1000);
             }
 
             CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->resume();
-
-            $this->handleClose();
         });
 
         CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->yield();
@@ -73,6 +78,8 @@ class SseCoroutineServerTransport implements SseServerTransport
         if (isset($this->connections[$sessionId])) {
             unset($this->connections[$sessionId]);
         }
+
+        $this->handleClose();
     }
 
     public function handleMessage(string $message): void
