@@ -19,6 +19,7 @@ use Hyperf\Redis\Redis;
 use Psr\Container\ContainerInterface;
 
 use function Hyperf\Coroutine\co;
+use function Hyperf\Support\msleep;
 
 class RedisSseServerTransport extends CoroutineSseServerTransport
 {
@@ -37,6 +38,12 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
 
     public function start(string $endpoint): void
     {
+        co(function () {
+            while (true) {
+                $this->redis->ping();
+                msleep(1000);
+            }
+        });
         co(function () {
             $this->redis->psubscribe(["{$this->prefix}mcp.sse.*"], function ($redis, $pattern, $channel, $message) {
                 $sessionId = (string) substr($channel, strlen("{$this->prefix}mcp.sse."));
