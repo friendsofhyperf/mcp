@@ -67,7 +67,7 @@ class CoroutineSseServerTransport extends AbstractTransport
             unset($this->connections[$sessionId]);
         }
 
-        $this->close();
+        // $this->close();
     }
 
     public function writeMessage(string $message): void
