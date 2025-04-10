@@ -29,22 +29,22 @@ class CoroutineSseServerTransport implements SseServerTransport
     /**
      * @var callable|null
      */
-    private $onClose;
+    protected $onClose;
 
     /**
      * @var callable|null
      */
-    private $onMessage;
+    protected $onMessage;
 
     /**
      * @var callable|null
      */
-    private $onError;
+    protected $onError;
 
     /**
      * @var array<int, EventStream>
      */
-    private array $connections = [];
+    protected array $connections = [];
 
     public function __construct(
         protected RequestInterface $request,
