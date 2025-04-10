@@ -83,7 +83,7 @@ class SseCoroutineServerTransport implements SseServerTransport
             unset($this->connections[$sessionId]);
         }
 
-        $this->handleClose();
+        $this->close();
     }
 
     public function handleMessage(string $message): void
@@ -120,6 +120,7 @@ class SseCoroutineServerTransport implements SseServerTransport
 
     public function close(): void
     {
+        $this->handleClose();
     }
 
     public function setOnMessage(callable $callback): void
