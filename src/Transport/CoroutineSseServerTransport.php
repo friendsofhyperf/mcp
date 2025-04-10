@@ -24,7 +24,7 @@ use Throwable;
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
-class SseCoroutineServerTransport implements SseServerTransport
+class CoroutineSseServerTransport implements SseServerTransport
 {
     /**
      * @var callable|null
