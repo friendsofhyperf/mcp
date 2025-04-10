@@ -27,12 +27,14 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
         protected ContainerInterface $container,
         protected Redis $redis,
         protected string $prefix = '',
+        string $endpoint = '/sse',
     ) {
         parent::__construct(
             $container->get(RequestInterface::class),
             $container->get(ResponseInterface::class),
             $container->get(IdGenerator::class),
             $container->get(SessionIdGenerator::class),
+            $endpoint
         );
     }
 
