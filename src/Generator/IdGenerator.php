@@ -9,9 +9,9 @@ declare(strict_types=1);
  * @contact  Deeka Wong <huangdijia@gmail.com>
  */
 
-namespace FriendsOfHyperf\MCP;
+namespace FriendsOfHyperf\MCP\Generator;
 
-class IdGenerator implements Contract\IdGenerator
+class IdGenerator implements \FriendsOfHyperf\MCP\Contract\IdGenerator
 {
     public function __construct(
         protected ?int $lastId = null,

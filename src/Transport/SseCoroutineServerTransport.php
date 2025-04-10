@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Transport;
 
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
+use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
@@ -49,12 +50,13 @@ class SseCoroutineServerTransport implements SseServerTransport
         protected RequestInterface $request,
         protected ResponseInterface $response,
         protected IdGenerator $idGenerator,
+        protected SessionIdGenerator $sessionIdGenerator,
     ) {
     }
 
     public function start(string $endpoint): void
     {
-        $sessionId = uniqid('sess_', true);
+        $sessionId = $this->sessionIdGenerator->generate();
         /** @var \Hyperf\Engine\Contract\Http\Writable $psr7Response */
         $psr7Response = $this->response->getConnection(); // @phpstan-ignore method.notFound
         $eventStream = (new EventStream($psr7Response))

@@ -30,7 +30,7 @@ class ConfigProvider
                 MCPCommand::class,
             ],
             'dependencies' => [
-                Contract\IdGenerator::class => IdGenerator::class,
+                Contract\IdGenerator::class => Generator\IdGenerator::class,
                 SseServerTransport::class => SseCoroutineServerTransport::class,
             ],
             'listeners' => [
