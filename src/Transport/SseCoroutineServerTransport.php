@@ -55,6 +55,7 @@ class SseCoroutineServerTransport implements SseServerTransport
     public function start(string $endpoint): void
     {
         $sessionId = uniqid('sess_', true);
+        /** @var \Hyperf\Engine\Contract\Http\Writable $psr7Response */
         $psr7Response = $this->response->getConnection(); // @phpstan-ignore method.notFound
         $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
