@@ -12,12 +12,14 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Transport;
 
 use FriendsOfHyperf\MCP\Contract\SseServerTransport;
-use Hyperf\Context\RequestContext;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Throwable;
+
+use function Hyperf\Coroutine\co;
+use function Hyperf\Support\msleep;
 
 class SseCoroutineServerTransport implements SseServerTransport
 {
@@ -50,13 +52,23 @@ class SseCoroutineServerTransport implements SseServerTransport
     public function start(string $endpoint): void
     {
         $sessionId = uniqid('sess_', true);
-        $fd = RequestContext::get()->getSwooleRequest()->fd; // @phpstan-ignore method.notFound
-        $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
+        $psr7Response = $this->response->getConnection(); // @phpstan-ignore method.notFound
+        $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
 
-        CoordinatorManager::until("mcp-sse:fd:{$fd}")->yield();
+        co(function () use ($sessionId, $psr7Response) {
+            while ($psr7Response->write('{}')) {
+                msleep(1000);
+            }
+
+            CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->resume();
+
+            $this->handleClose();
+        });
+
+        CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->yield();
 
         if (isset($this->connections[$sessionId])) {
             unset($this->connections[$sessionId]);
