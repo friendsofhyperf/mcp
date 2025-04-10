@@ -47,6 +47,7 @@ class MCPCommand extends Command
             'output' => $this->output,
         ]);
         $server->connect($transport);
+        $transport->start();
 
         while (true) { // @phpstan-ignore-line
             try {

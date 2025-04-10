@@ -30,7 +30,7 @@ class ConfigProvider
             'dependencies' => [
                 Contract\IdGenerator::class => Generator\IdGenerator::class,
                 Contract\SessionIdGenerator::class => Generator\SessionIdGenerator::class,
-                Contract\SseServerTransport::class => Transport\CoroutineSseServerTransport::class,
+                Contract\ServerTransport::class => Transport\CoroutineSseServerTransport::class,
             ],
             'listeners' => [
                 RegisterServerListener::class,

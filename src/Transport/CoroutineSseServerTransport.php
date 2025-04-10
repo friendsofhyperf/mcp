@@ -22,7 +22,7 @@ use ModelContextProtocol\SDK\Types;
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
-class CoroutineSseServerTransport extends Transport
+class CoroutineSseServerTransport extends AbstractTransport
 {
     /**
      * @var array<int, EventStream>
@@ -34,17 +34,18 @@ class CoroutineSseServerTransport extends Transport
         protected ResponseInterface $response,
         protected IdGenerator $idGenerator,
         protected SessionIdGenerator $sessionIdGenerator,
+        protected string $endpoint = '/sse',
     ) {
     }
 
-    public function start(string $endpoint): void
+    public function start(): void
     {
         $sessionId = $this->sessionIdGenerator->generate();
         /** @var \Hyperf\Engine\Contract\Http\Writable $psr7Response */
         $psr7Response = $this->response->getConnection(); // @phpstan-ignore method.notFound
         $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
-            ->write("data: {$endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
+            ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
 
         co(function () use ($sessionId, $psr7Response) {
@@ -69,7 +70,7 @@ class CoroutineSseServerTransport extends Transport
         $this->close();
     }
 
-    public function send(string $message): void
+    public function writeMessage(string $message): void
     {
         $sessionId = (string) $this->request->input('sessionId');
 

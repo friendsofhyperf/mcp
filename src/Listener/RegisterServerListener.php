@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Listener;
 
-use FriendsOfHyperf\MCP\Contract\SseServerTransport;
+use FriendsOfHyperf\MCP\Contract\ServerTransport;
 use FriendsOfHyperf\MCP\ServerRegistry;
 use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
@@ -59,26 +59,27 @@ class RegisterServerListener implements ListenerInterface
                 continue;
             }
 
-            $transport = make(SseServerTransport::class);
-            $server->connect($transport);
-
             $serverName = $options['sse']['server'];
             $endpoint = $options['sse']['endpoint'];
+            $transport = make(ServerTransport::class, [
+                'endpoint' => $endpoint,
+            ]);
+            $server->connect($transport);
 
             $this->registerSseRouter($transport, $serverName, $endpoint);
         }
     }
 
-    protected function registerSseRouter(SseServerTransport $transport, string $serverName, string $endpoint): void
+    protected function registerSseRouter(ServerTransport $transport, string $serverName, string $endpoint): void
     {
         Router::addServer($serverName, function () use ($transport, $endpoint) {
             Router::addRoute(
                 ['GET', 'POST'],
                 $endpoint,
-                function (RequestInterface $request) use ($transport, $endpoint) {
+                function (RequestInterface $request) use ($transport) {
                     try {
                         match ($request->getMethod()) {
-                            'GET' => $transport->start($endpoint),
+                            'GET' => $transport->start(),
                             'POST' => $transport->handleMessage($request->getBody()->getContents()),
                             default => throw new RuntimeException('Method not allowed'),
                         };

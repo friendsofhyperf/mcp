@@ -36,7 +36,7 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
         );
     }
 
-    public function start(string $endpoint): void
+    public function start(): void
     {
         co(function () {
             while (true) { // @phpstan-ignore-line
@@ -53,10 +53,10 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
             });
         });
 
-        parent::start($endpoint);
+        parent::start();
     }
 
-    public function send(string $message): void
+    public function writeMessage(string $message): void
     {
         $sessionId = (string) $this->request->input('sessionId');
 

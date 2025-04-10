@@ -28,6 +28,10 @@ class StdioServerTransport implements Transport
         protected InputInterface $input,
         protected OutputInterface $output,
     ) {
+    }
+
+    public function start(): void
+    {
         $this->active = true;
     }
 
@@ -38,7 +42,7 @@ class StdioServerTransport implements Transport
         $this->handleClose();
     }
 
-    public function send(string $message): void
+    public function writeMessage(string $message): void
     {
         if ($this->active) {
             $this->output->writeln($message);

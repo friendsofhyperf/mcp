@@ -12,15 +12,7 @@ declare(strict_types=1);
 namespace FriendsOfHyperf\MCP\Contract;
 
 use ModelContextProtocol\SDK\Shared\Transport;
-use Throwable;
 
-interface SseServerTransport extends Transport
+interface ServerTransport extends Transport
 {
-    public function start(string $endpoint): void;
-
-    public function handleMessage(string $message): void;
-
-    public function handleError(Throwable $error): void;
-
-    public function handleClose(): void;
 }
