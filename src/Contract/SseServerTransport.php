@@ -16,7 +16,7 @@ use Throwable;
 
 interface SseServerTransport extends Transport
 {
-    public function start(string $route): void;
+    public function start(string $endpoint): void;
 
     public function handleMessage(string $message): void;
 
