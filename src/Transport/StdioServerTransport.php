@@ -30,6 +30,11 @@ class StdioServerTransport implements Transport
     ) {
     }
 
+    public function __destruct()
+    {
+        $this->close();
+    }
+
     public function start(): void
     {
         $this->active = true;
