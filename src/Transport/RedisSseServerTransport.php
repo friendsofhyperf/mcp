@@ -19,6 +19,8 @@ use function Hyperf\Support\msleep;
 
 class RedisSseServerTransport extends CoroutineSseServerTransport
 {
+    protected bool $isSubscribing = false;
+
     public function __construct(
         ContainerInterface $container,
         string $endpoint = '/sse',
@@ -31,18 +33,22 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
 
     public function start(): void
     {
-        co(function () {
-            while (true) { // @phpstan-ignore-line
-                $this->redis->ping();
-                msleep(1000);
-            }
-        });
-        co(function () {
-            $this->redis->psubscribe(["{$this->prefix}mcp.sse.*"], function ($redis, $pattern, $channel, $message) {
-                $sessionId = (string) substr($channel, strlen("{$this->prefix}mcp.sse."));
-                $this->connectionManager->get($sessionId)?->write("event: message\ndata: {$message}\n\n");
+        if (! $this->isSubscribing) {
+            co(function () {
+                while (true) { // @phpstan-ignore-line
+                    $this->redis->ping();
+                    msleep(1000);
+                }
             });
-        });
+            co(function () {
+                $this->redis->psubscribe(["{$this->prefix}mcp.sse.*"], function ($redis, $pattern, $channel, $message) {
+                    $sessionId = (string) substr($channel, strlen("{$this->prefix}mcp.sse."));
+                    $this->connectionManager->get($sessionId)?->write("event: message\ndata: {$message}\n\n");
+                });
+            });
+
+            $this->isSubscribing = true;
+        }
 
         parent::start();
     }
