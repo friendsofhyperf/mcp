@@ -11,14 +11,11 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
-use ModelContextProtocol\SDK\Shared\Transport;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StdioServerTransport implements Transport
+class StdioServerTransport extends AbstractTransport
 {
-    use Traits\InteractsWithCallbacks;
-
     /**
      * @var bool whether the transport is active
      */

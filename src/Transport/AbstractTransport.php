@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
-abstract class AbstractTransport implements \ModelContextProtocol\SDK\Shared\Transport
+use FriendsOfHyperf\MCP\Contract\ServerTransport;
+use ModelContextProtocol\SDK\Server\Transport\Traits\InteractsWithCallbacks;
+
+abstract class AbstractTransport implements ServerTransport
 {
-    use Traits\InteractsWithCallbacks;
+    use InteractsWithCallbacks;
 
     abstract public function writeMessage(string $message): void;
 
