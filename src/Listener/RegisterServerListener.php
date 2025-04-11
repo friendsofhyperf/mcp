@@ -61,18 +61,25 @@ class RegisterServerListener implements ListenerInterface
 
             $serverName = $options['sse']['server'];
             $endpoint = $options['sse']['endpoint'];
+            $middlewares = $options['sse']['middlewares'] ?? [];
             $transport = make(ServerTransport::class, [
                 'endpoint' => $endpoint,
             ]);
             $server->connect($transport);
 
-            $this->registerSseRouter($transport, $serverName, $endpoint);
+            $this->registerSseRouter($transport, $serverName, $endpoint, [
+                'middlewares' => $middlewares,
+            ]);
         }
     }
 
-    protected function registerSseRouter(ServerTransport $transport, string $serverName, string $endpoint): void
-    {
-        Router::addServer($serverName, function () use ($transport, $endpoint) {
+    protected function registerSseRouter(
+        ServerTransport $transport,
+        string $serverName,
+        string $endpoint,
+        array $options = []
+    ): void {
+        Router::addServer($serverName, function () use ($transport, $endpoint, $options) {
             Router::addRoute(
                 ['GET', 'POST'],
                 $endpoint,
@@ -86,7 +93,8 @@ class RegisterServerListener implements ListenerInterface
                     } catch (Throwable $e) {
                         $transport->handleError($e);
                     }
-                }
+                },
+                $options
             );
         });
     }

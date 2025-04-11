@@ -18,6 +18,7 @@ return [
             'sse' => [
                 'server' => 'http',
                 'endpoint' => '/sse',
+                'middlewares' => [],
             ],
             'options' => [
                 'logger' => null,
