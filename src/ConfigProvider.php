@@ -24,6 +24,15 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
+            'annotations' => [
+                'scan' => [
+                    'collectors' => [
+                        PromptCollector::class,
+                        ResourceCollector::class,
+                        ToolCollector::class,
+                    ],
+                ],
+            ],
             'commands' => [
                 MCPCommand::class,
             ],
@@ -41,15 +50,6 @@ class ConfigProvider
                     'description' => 'The configuration file of mcp.',
                     'source' => __DIR__ . '/../publish/mcp.php',
                     'destination' => BASE_PATH . '/config/autoload/mcp.php',
-                ],
-            ],
-            'annotations' => [
-                'scan' => [
-                    'collectors' => [
-                        PromptCollector::class,
-                        ResourceCollector::class,
-                        ToolCollector::class,
-                    ],
                 ],
             ],
         ];
