@@ -25,15 +25,17 @@ class ProcessSseServerTransport extends CoroutineSseServerTransport
             return;
         }
 
+        /** @var Server $server */
         $server = $this->container->get(Server::class);
         $workerCount = $server->setting['worker_num'] - 1;
+        $pipeMessage = new SsePipeMessage($sessionId, $message);
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
             if ($workerId === $server->worker_id) {
                 continue;
             }
 
-            $server->sendMessage(new SsePipeMessage($sessionId, $message), $workerId);
+            $server->sendMessage($pipeMessage, $workerId);
         }
     }
 }
