@@ -23,8 +23,6 @@ use function Hyperf\Support\make;
 
 class MCPCommand extends Command
 {
-    protected bool $coroutine = false;
-
     protected ?string $signature = 'mcp:run {--name= : The name of the mcp server.}';
 
     protected string $description = 'This command runs the mcp server.';
