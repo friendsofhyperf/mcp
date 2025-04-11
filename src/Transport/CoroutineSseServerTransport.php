@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
+use FriendsOfHyperf\MCP\ConnectionManager;
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
 use Hyperf\Coroutine\WaitGroup;
@@ -28,11 +29,6 @@ use function Hyperf\Support\msleep;
 
 class CoroutineSseServerTransport extends AbstractTransport
 {
-    /**
-     * @var array<int, EventStream>
-     */
-    protected array $connections = [];
-
     protected RequestInterface $request;
 
     protected ResponseInterface $response;
@@ -40,6 +36,8 @@ class CoroutineSseServerTransport extends AbstractTransport
     protected IdGenerator $idGenerator;
 
     protected SessionIdGenerator $sessionIdGenerator;
+
+    protected ConnectionManager $connectionManager;
 
     public function __construct(
         protected ContainerInterface $container,
@@ -49,6 +47,7 @@ class CoroutineSseServerTransport extends AbstractTransport
         $this->response = $container->get(ResponseInterface::class);
         $this->idGenerator = $container->get(IdGenerator::class);
         $this->sessionIdGenerator = $container->get(SessionIdGenerator::class);
+        $this->connectionManager = $container->get(ConnectionManager::class);
     }
 
     public function start(): void
@@ -59,7 +58,7 @@ class CoroutineSseServerTransport extends AbstractTransport
         $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
-        $this->connections[$sessionId] = $eventStream;
+        $this->connectionManager->register($sessionId, $eventStream);
 
         $waitGroup = new WaitGroup();
 
@@ -85,9 +84,7 @@ class CoroutineSseServerTransport extends AbstractTransport
 
         $waitGroup->wait();
 
-        if (isset($this->connections[$sessionId])) {
-            unset($this->connections[$sessionId]);
-        }
+        $this->connectionManager->unregister($sessionId);
 
         // $this->close();
     }
@@ -96,11 +93,9 @@ class CoroutineSseServerTransport extends AbstractTransport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if (! isset($this->connections[$sessionId])) {
-            return;
+        if ($this->connectionManager->has($sessionId)) {
+            $this->connectionManager->get($sessionId)->write("event: message\ndata: {$message}\n\n");
         }
-
-        $this->connections[$sessionId]->write("event: message\ndata: {$message}\n\n");
     }
 
     public function close(): void

@@ -15,6 +15,7 @@ use FriendsOfHyperf\MCP\Collector\PromptCollector;
 use FriendsOfHyperf\MCP\Collector\ResourceCollector;
 use FriendsOfHyperf\MCP\Collector\ToolCollector;
 use FriendsOfHyperf\MCP\Command\MCPCommand;
+use FriendsOfHyperf\MCP\Listener\OnPipeMessageListener;
 use FriendsOfHyperf\MCP\Listener\RegisterServerListener;
 
 defined('BASE_PATH') or define('BASE_PATH', dirname(__DIR__));
@@ -43,6 +44,7 @@ class ConfigProvider
             ],
             'listeners' => [
                 RegisterServerListener::class,
+                OnPipeMessageListener::class,
             ],
             'publish' => [
                 [
