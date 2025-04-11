@@ -17,12 +17,13 @@ use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use ModelContextProtocol\SDK\Server\Transport\AbstractTransport;
 use ModelContextProtocol\SDK\Types;
 
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
-class CoroutineSseServerTransport extends AbstractTransport
+class CoroutineSseServerTransport extends AbstractTransport implements \FriendsOfHyperf\MCP\Contract\ServerTransport
 {
     /**
      * @var array<int, EventStream>
