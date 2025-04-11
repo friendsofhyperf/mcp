@@ -95,6 +95,6 @@ class CoroutineSseServerTransport extends AbstractTransport
 
     public function close(): void
     {
-        $this->handleClose();
+        parent::close();
     }
 }

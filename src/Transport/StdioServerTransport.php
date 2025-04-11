@@ -42,7 +42,7 @@ class StdioServerTransport extends AbstractTransport
     {
         $this->active = false;
 
-        $this->handleClose();
+        parent::close();
     }
 
     public function writeMessage(string $message): void
