@@ -13,12 +13,14 @@ namespace FriendsOfHyperf\MCP\Transport;
 
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
-use Hyperf\Coordinator\CoordinatorManager;
+use Hyperf\Coroutine\WaitGroup;
+use Hyperf\Engine\Contract\Http\Writable;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Server\Transport\AbstractTransport;
 use ModelContextProtocol\SDK\Types;
+use Throwable;
 
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
@@ -42,27 +44,36 @@ class CoroutineSseServerTransport extends AbstractTransport
     public function start(): void
     {
         $sessionId = $this->sessionIdGenerator->generate();
-        /** @var \Hyperf\Engine\Contract\Http\Writable $psr7Response */
+        /** @var Writable $psr7Response */
         $psr7Response = $this->response->getConnection(); // @phpstan-ignore method.notFound
         $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections[$sessionId] = $eventStream;
 
-        co(function () use ($sessionId, $psr7Response) {
-            $ping = json_encode([
-                'jsonrpc' => Types::JSONRPC_VERSION,
-                'id' => $this->idGenerator->generate(),
-                'method' => 'ping',
-            ]);
-            while ($psr7Response->write($ping)) {
-                msleep(1000);
-            }
+        $waitGroup = new WaitGroup();
 
-            CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->resume();
+        co(function () use ($psr7Response, $waitGroup) {
+            $waitGroup->add(1);
+            try {
+                while (true) {
+                    $ping = json_encode([
+                        'jsonrpc' => Types::JSONRPC_VERSION,
+                        'id' => $this->idGenerator->generate(),
+                        'method' => 'ping',
+                    ]);
+                    if (! $psr7Response->write($ping)) {
+                        break;
+                    }
+                    msleep(1000);
+                }
+            } catch (Throwable $e) {
+            } finally {
+                $waitGroup->done();
+            }
         });
 
-        CoordinatorManager::until("mcp-sse:sessions:{$sessionId}")->yield();
+        $waitGroup->wait();
 
         if (isset($this->connections[$sessionId])) {
             unset($this->connections[$sessionId]);
