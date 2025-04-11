@@ -11,10 +11,6 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Transport;
 
-use FriendsOfHyperf\MCP\Contract\IdGenerator;
-use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
-use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Redis\Redis;
 use Psr\Container\ContainerInterface;
 
@@ -24,18 +20,13 @@ use function Hyperf\Support\msleep;
 class RedisSseServerTransport extends CoroutineSseServerTransport
 {
     public function __construct(
-        protected ContainerInterface $container,
-        protected Redis $redis,
-        protected string $prefix = '',
+        ContainerInterface $container,
         string $endpoint = '/sse',
+        protected ?Redis $redis = null,
+        protected string $prefix = '',
     ) {
-        parent::__construct(
-            $container->get(RequestInterface::class),
-            $container->get(ResponseInterface::class),
-            $container->get(IdGenerator::class),
-            $container->get(SessionIdGenerator::class),
-            $endpoint
-        );
+        $this->redis ??= $container->get(Redis::class);
+        parent::__construct($container, $endpoint);
     }
 
     public function start(): void

@@ -20,6 +20,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use ModelContextProtocol\SDK\Server\Transport\AbstractTransport;
 use ModelContextProtocol\SDK\Types;
+use Psr\Container\ContainerInterface;
 use Throwable;
 
 use function Hyperf\Coroutine\co;
@@ -32,13 +33,22 @@ class CoroutineSseServerTransport extends AbstractTransport
      */
     protected array $connections = [];
 
+    protected RequestInterface $request;
+
+    protected ResponseInterface $response;
+
+    protected IdGenerator $idGenerator;
+
+    protected SessionIdGenerator $sessionIdGenerator;
+
     public function __construct(
-        protected RequestInterface $request,
-        protected ResponseInterface $response,
-        protected IdGenerator $idGenerator,
-        protected SessionIdGenerator $sessionIdGenerator,
+        protected ContainerInterface $container,
         protected string $endpoint = '/sse',
     ) {
+        $this->request = $container->get(RequestInterface::class);
+        $this->response = $container->get(ResponseInterface::class);
+        $this->idGenerator = $container->get(IdGenerator::class);
+        $this->sessionIdGenerator = $container->get(SessionIdGenerator::class);
     }
 
     public function start(): void
