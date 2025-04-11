@@ -67,6 +67,9 @@ class RegisterServerListener implements ListenerInterface
             ]);
             $server->connect($transport);
 
+            // fix the bug that the server is not initialized when the server style is process
+            (fn () => $this->initialized = true)->call($server);
+
             $this->registerSseRouter($transport, $serverName, $endpoint, [
                 'middlewares' => $middlewares,
             ]);
