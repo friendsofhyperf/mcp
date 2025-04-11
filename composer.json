@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=8.1",
-        "huangdijia/mcp-sdk-php": "dev-main",
+        "huangdijia/mcp-sdk-php": "^0.1.0",
         "hyperf/command": "~3.1.0",
         "hyperf/event": "~3.1.0",
         "hyperf/framework": "~3.1.0",
