@@ -20,7 +20,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Router;
 use ModelContextProtocol\SDK\Server\McpServer;
-use ModelContextProtocol\SDK\Shared\Transport as ServerTransport;
+use ModelContextProtocol\SDK\Shared\Transport;
 use RuntimeException;
 use Throwable;
 
@@ -62,7 +62,7 @@ class RegisterServerListener implements ListenerInterface
             $serverName = $options['sse']['server'];
             $endpoint = $options['sse']['endpoint'];
             $middlewares = $options['sse']['middlewares'] ?? [];
-            $transport = make(ServerTransport::class, [
+            $transport = make(Transport::class, [
                 'endpoint' => $endpoint,
             ]);
             $server->connect($transport);
@@ -74,7 +74,7 @@ class RegisterServerListener implements ListenerInterface
     }
 
     protected function registerSseRouter(
-        ServerTransport $transport,
+        Transport $transport,
         string $serverName,
         string $endpoint,
         array $options = []
