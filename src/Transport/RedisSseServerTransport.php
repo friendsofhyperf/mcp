@@ -62,7 +62,8 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if (! isset($this->connections[$sessionId])) {
+        if (isset($this->connections[$sessionId])) {
+            $this->connections[$sessionId]->write("event: message\ndata: {$message}\n\n");
             return;
         }
 
