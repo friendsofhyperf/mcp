@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Command;
 
-use FriendsOfHyperf\MCP\Contract\ServerTransport;
 use FriendsOfHyperf\MCP\ServerRegistry;
 use FriendsOfHyperf\MCP\Transport\StdioServerTransport;
 use Hyperf\Command\Command;
@@ -42,7 +41,7 @@ class MCPCommand extends Command
     public function handle(): void
     {
         $server = $this->registry->get($this->input->getOption('name'));
-        /** @var ServerTransport $transport */
+        /** @var \ModelContextProtocol\SDK\Shared\Transport $transport */
         $transport = make(StdioServerTransport::class, [
             'input' => $this->input,
             'output' => $this->output,

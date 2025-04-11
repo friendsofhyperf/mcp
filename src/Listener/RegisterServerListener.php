@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FriendsOfHyperf\MCP\Listener;
 
-use FriendsOfHyperf\MCP\Contract\ServerTransport;
 use FriendsOfHyperf\MCP\ServerRegistry;
 use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
@@ -21,6 +20,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Router;
 use ModelContextProtocol\SDK\Server\McpServer;
+use ModelContextProtocol\SDK\Shared\Transport as ServerTransport;
 use RuntimeException;
 use Throwable;
 

@@ -23,7 +23,7 @@ use ModelContextProtocol\SDK\Types;
 use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
-class CoroutineSseServerTransport extends AbstractTransport implements \FriendsOfHyperf\MCP\Contract\ServerTransport
+class CoroutineSseServerTransport extends AbstractTransport
 {
     /**
      * @var array<int, EventStream>

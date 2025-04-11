@@ -15,7 +15,7 @@ use ModelContextProtocol\SDK\Server\Transport\AbstractTransport;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StdioServerTransport extends AbstractTransport implements \FriendsOfHyperf\MCP\Contract\ServerTransport
+class StdioServerTransport extends AbstractTransport
 {
     /**
      * @var bool whether the transport is active
