@@ -37,7 +37,7 @@ class CoroutineSseServerTransport extends AbstractTransport
 
     protected SessionIdGenerator $sessionIdGenerator;
 
-    protected ConnectionManager $connectionManager;
+    protected ConnectionManager $connections;
 
     public function __construct(
         protected ContainerInterface $container,
@@ -47,7 +47,7 @@ class CoroutineSseServerTransport extends AbstractTransport
         $this->response = $container->get(ResponseInterface::class);
         $this->idGenerator = $container->get(IdGenerator::class);
         $this->sessionIdGenerator = $container->get(SessionIdGenerator::class);
-        $this->connectionManager = $container->get(ConnectionManager::class);
+        $this->connections = $container->get(ConnectionManager::class);
     }
 
     public function start(): void
@@ -58,7 +58,7 @@ class CoroutineSseServerTransport extends AbstractTransport
         $eventStream = (new EventStream($psr7Response))
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
-        $this->connectionManager->register($sessionId, $eventStream);
+        $this->connections->register($sessionId, $eventStream);
 
         $waitGroup = new WaitGroup();
 
@@ -84,7 +84,7 @@ class CoroutineSseServerTransport extends AbstractTransport
 
         $waitGroup->wait();
 
-        $this->connectionManager->unregister($sessionId);
+        $this->connections->unregister($sessionId);
 
         // $this->close();
     }
@@ -93,8 +93,8 @@ class CoroutineSseServerTransport extends AbstractTransport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if ($this->connectionManager->has($sessionId)) {
-            $this->connectionManager->get($sessionId)->write("event: message\ndata: {$message}\n\n");
+        if ($this->connections->has($sessionId)) {
+            $this->connections->get($sessionId)->write("event: message\ndata: {$message}\n\n");
         }
     }
 

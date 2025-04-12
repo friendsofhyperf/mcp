@@ -44,7 +44,7 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
         $this->subscribeCoroutineId ??= Coroutine::create(function () {
             $this->redis->psubscribe(["{$this->prefix}mcp.sse.*"], function ($redis, $pattern, $channel, $message) {
                 $sessionId = (string) substr($channel, strlen("{$this->prefix}mcp.sse."));
-                $this->connectionManager->get($sessionId)?->write("event: message\ndata: {$message}\n\n");
+                $this->connections->get($sessionId)?->write("event: message\ndata: {$message}\n\n");
             });
         });
 
@@ -55,8 +55,8 @@ class RedisSseServerTransport extends CoroutineSseServerTransport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if ($this->connectionManager->has($sessionId)) {
-            $this->connectionManager->get($sessionId)->write("event: message\ndata: {$message}\n\n");
+        if ($this->connections->has($sessionId)) {
+            $this->connections->get($sessionId)->write("event: message\ndata: {$message}\n\n");
             return;
         }
 

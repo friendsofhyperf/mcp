@@ -19,7 +19,7 @@ use Hyperf\Framework\Event\OnPipeMessage;
 class OnPipeMessageListener implements ListenerInterface
 {
     public function __construct(
-        protected ConnectionManager $connectionManager,
+        protected ConnectionManager $connections,
     ) {
     }
 
@@ -30,12 +30,15 @@ class OnPipeMessageListener implements ListenerInterface
         ];
     }
 
+    /**
+     * @param OnPipeMessage|object $event
+     */
     public function process(object $event): void
     {
         $message = $event->data;
 
         if ($event instanceof OnPipeMessage && $message instanceof SsePipeMessage) {
-            $this->connectionManager->get($message->sessionId)?->write("event: message\ndata: {$message->message}\n\n");
+            $this->connections->get($message->sessionId)?->write("event: message\ndata: {$message->message}\n\n");
         }
     }
 }

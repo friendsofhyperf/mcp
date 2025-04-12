@@ -20,8 +20,8 @@ class ProcessSseServerTransport extends CoroutineSseServerTransport
     {
         $sessionId = (string) $this->request->input('sessionId');
 
-        if ($this->connectionManager->has($sessionId)) {
-            $this->connectionManager->get($sessionId)->write("event: message\ndata: {$message}\n\n");
+        if ($this->connections->has($sessionId)) {
+            $this->connections->get($sessionId)->write("event: message\ndata: {$message}\n\n");
             return;
         }
 
