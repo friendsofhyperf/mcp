@@ -46,6 +46,12 @@ return [
             'sse' => [
                 'server' => 'http',
                 'endpoint' => '/sse',
+                'middlewares' => [],
+            ],
+            // 其他配置选项
+            'options' => [
+                'logger' => null,
+                'enforceStrictCapabilities' => false,
             ],
         ],
     ],

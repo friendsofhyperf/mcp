@@ -20,6 +20,7 @@ return [
                 'endpoint' => '/sse',
                 'middlewares' => [],
             ],
+            // Other options
             'options' => [
                 'logger' => null,
                 'enforceStrictCapabilities' => false,
