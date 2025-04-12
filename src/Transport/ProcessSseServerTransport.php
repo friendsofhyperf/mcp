@@ -16,6 +16,8 @@ use Swoole\Server;
 
 class ProcessSseServerTransport extends CoroutineSseServerTransport
 {
+    protected ?Server $server;
+
     public function writeMessage(string $message): void
     {
         $sessionId = (string) $this->request->input('sessionId');
@@ -25,17 +27,16 @@ class ProcessSseServerTransport extends CoroutineSseServerTransport
             return;
         }
 
-        /** @var Server $server */
-        $server = $this->container->get(Server::class);
-        $workerCount = $server->setting['worker_num'] - 1;
+        $this->server ??= $this->container->get(Server::class);
+        $workerCount = $this->server->setting['worker_num'] - 1;
         $pipeMessage = new SsePipeMessage($sessionId, $message);
 
         for ($workerId = 0; $workerId <= $workerCount; ++$workerId) {
-            if ($workerId === $server->worker_id) {
+            if ($workerId === $this->server->worker_id) {
                 continue;
             }
 
-            $server->sendMessage($pipeMessage, $workerId);
+            $this->server->sendMessage($pipeMessage, $workerId);
         }
     }
 }
