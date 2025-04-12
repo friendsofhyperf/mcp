@@ -31,7 +31,10 @@ use function Hyperf\Support\msleep;
 
 class SseServerTransport extends AbstractTransport
 {
-    protected ?Server $server;
+    /**
+     * @var Server|null
+     */
+    protected $server;
 
     protected RequestInterface $request;
 
