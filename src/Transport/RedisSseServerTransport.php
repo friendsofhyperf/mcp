@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
 
 use function Hyperf\Support\msleep;
 
-class RedisSseServerTransport extends CoroutineSseServerTransport
+class RedisSseServerTransport extends SseServerTransport
 {
     protected ?int $pingCoroutineId = null;
 
