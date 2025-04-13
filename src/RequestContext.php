@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\MCP;
 use Hyperf\Context\Context;
 use Hyperf\Engine\Http\EventStream;
 
-class SseContext
+class RequestContext
 {
     public static function setSessionId(string $sessionId): string
     {

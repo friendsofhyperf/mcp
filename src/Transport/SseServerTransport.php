@@ -14,7 +14,7 @@ namespace FriendsOfHyperf\MCP\Transport;
 use FriendsOfHyperf\MCP\ConnectionManager;
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
-use FriendsOfHyperf\MCP\SseContext;
+use FriendsOfHyperf\MCP\RequestContext;
 use FriendsOfHyperf\MCP\SsePipeMessage;
 use Hyperf\Engine\Contract\Http\Writable;
 use Hyperf\Engine\Http\EventStream;
@@ -69,8 +69,8 @@ class SseServerTransport extends AbstractTransport
         $this->connections->register($sessionId, $connection);
 
         // Set the sessionId and connection to the request context
-        SseContext::setSessionId($sessionId);
-        SseContext::setConnection($connection);
+        RequestContext::setSessionId($sessionId);
+        RequestContext::setConnection($connection);
 
         defer(function () use ($sessionId) {
             $this->connections->unregister($sessionId);
