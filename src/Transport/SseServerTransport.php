@@ -67,7 +67,10 @@ class SseServerTransport extends AbstractTransport
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections->register($sessionId, $connection);
 
-        defer(fn () => $this->connections->unregister($sessionId));
+        defer(function () use ($sessionId) {
+            $this->connections->unregister($sessionId);
+            $this->close();
+        });
 
         $waitGroup = new WaitGroup();
 
@@ -92,8 +95,6 @@ class SseServerTransport extends AbstractTransport
         });
 
         $waitGroup->wait();
-
-        // $this->close();
     }
 
     public function writeMessage(string $message): void
