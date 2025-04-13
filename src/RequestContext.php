@@ -26,6 +26,36 @@ class RequestContext
         return Context::get('mcp.sse.sessionId');
     }
 
+    public static function setId(?int $id): ?int
+    {
+        return Context::set('mcp.sse.id', $id);
+    }
+
+    public static function getId(): ?int
+    {
+        return Context::get('mcp.sse.id');
+    }
+
+    public static function setMethod(?string $method): ?string
+    {
+        return Context::set('mcp.sse.method', $method);
+    }
+
+    public static function getMethod(): ?string
+    {
+        return Context::get('mcp.sse.method');
+    }
+
+    public static function setParams(?array $params): ?array
+    {
+        return Context::set('mcp.sse.params', $params);
+    }
+
+    public static function getParams(): ?array
+    {
+        return Context::get('mcp.sse.params');
+    }
+
     public static function setConnection(EventStream $connection): EventStream
     {
         return Context::set('mcp.sse.connection', $connection);

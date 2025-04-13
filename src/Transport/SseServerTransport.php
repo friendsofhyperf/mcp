@@ -98,6 +98,17 @@ class SseServerTransport extends AbstractTransport
         );
     }
 
+    public function handleMessage(string $message): void
+    {
+        $data = json_decode($message, true, 512, JSON_THROW_ON_ERROR);
+
+        RequestContext::setId($data['id'] ?? null);
+        RequestContext::setMethod($data['method'] ?? null);
+        RequestContext::setParams($data['params'] ?? null);
+
+        parent::handleMessage($message);
+    }
+
     public function writeMessage(string $message): void
     {
         $sessionId = (string) $this->request->input('sessionId');
