@@ -25,6 +25,7 @@ use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Throwable;
 
+use function Hyperf\Coroutine\defer;
 use function Hyperf\Coroutine\wait;
 use function Hyperf\Support\msleep;
 
