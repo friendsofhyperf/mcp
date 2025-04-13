@@ -15,6 +15,7 @@ use FriendsOfHyperf\MCP\ConnectionManager;
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
 use FriendsOfHyperf\MCP\SsePipeMessage;
+use Hyperf\Coroutine\WaitGroup;
 use Hyperf\Engine\Contract\Http\Writable;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -25,7 +26,7 @@ use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Throwable;
 
-use function Hyperf\Coroutine\wait;
+use function Hyperf\Coroutine\co;
 use function Hyperf\Support\msleep;
 
 class SseServerTransport extends AbstractTransport
@@ -66,30 +67,33 @@ class SseServerTransport extends AbstractTransport
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections->register($sessionId, $connection);
 
-        defer(function () use ($sessionId) {
-            $this->connections->unregister($sessionId);
-            $this->close();
+        defer(fn () => $this->connections->unregister($sessionId));
+
+        $waitGroup = new WaitGroup();
+
+        co(function () use ($psr7Response, $waitGroup) {
+            $waitGroup->add(1);
+            try {
+                while (true) {
+                    $ping = json_encode([
+                        'jsonrpc' => Types::JSONRPC_VERSION,
+                        'id' => $this->idGenerator->generate(),
+                        'method' => 'ping',
+                    ]);
+                    if (! $psr7Response->write($ping)) {
+                        break;
+                    }
+                    msleep(1000);
+                }
+            } catch (Throwable $e) {
+            } finally {
+                $waitGroup->done();
+            }
         });
 
-        wait(
-            closure: function () use ($psr7Response) {
-                try {
-                    while (true) {
-                        $ping = json_encode([
-                            'jsonrpc' => Types::JSONRPC_VERSION,
-                            'id' => $this->idGenerator->generate(),
-                            'method' => 'ping',
-                        ]);
-                        if (! $psr7Response->write($ping)) { // The connection of client is closed
-                            break;
-                        }
-                        msleep(1000);
-                    }
-                } catch (Throwable $e) {
-                }
-            },
-            timeout: -1
-        );
+        $waitGroup->wait();
+
+        // $this->close();
     }
 
     public function writeMessage(string $message): void
