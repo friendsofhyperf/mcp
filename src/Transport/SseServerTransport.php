@@ -67,6 +67,8 @@ class SseServerTransport extends AbstractTransport
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections->register($sessionId, $connection);
 
+        defer(fn () => $this->connections->unregister($sessionId));
+
         $waitGroup = new WaitGroup();
 
         co(function () use ($psr7Response, $waitGroup) {
@@ -90,8 +92,6 @@ class SseServerTransport extends AbstractTransport
         });
 
         $waitGroup->wait();
-
-        $this->connections->unregister($sessionId);
 
         // $this->close();
     }
