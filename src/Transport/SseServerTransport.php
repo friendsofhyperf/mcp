@@ -15,6 +15,7 @@ use FriendsOfHyperf\MCP\ConnectionManager;
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
 use FriendsOfHyperf\MCP\SsePipeMessage;
+use Hyperf\Coroutine\Barrier;
 use Hyperf\Engine\Contract\Http\Writable;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\HttpServer\Contract\RequestInterface;
@@ -25,8 +26,8 @@ use Psr\Container\ContainerInterface;
 use Swoole\Server;
 use Throwable;
 
+use function Hyperf\Coroutine\co;
 use function Hyperf\Coroutine\defer;
-use function Hyperf\Coroutine\wait;
 use function Hyperf\Support\msleep;
 
 class SseServerTransport extends AbstractTransport
@@ -72,25 +73,27 @@ class SseServerTransport extends AbstractTransport
             $this->close();
         });
 
-        wait(
-            closure: function () use ($psr7Response) {
-                try {
-                    while (true) {
-                        $ping = json_encode([
-                            'jsonrpc' => Types::JSONRPC_VERSION,
-                            'id' => $this->idGenerator->generate(),
-                            'method' => 'ping',
-                        ]);
-                        if (! $psr7Response->write($ping)) { // The connection of client is closed
-                            break;
-                        }
-                        msleep(1000);
+        $barrier = Barrier::create();
+
+        co(function () use ($psr7Response, $barrier) {
+            isset($barrier);
+            try {
+                while (true) {
+                    $ping = json_encode([
+                        'jsonrpc' => Types::JSONRPC_VERSION,
+                        'id' => $this->idGenerator->generate(),
+                        'method' => 'ping',
+                    ]);
+                    if (! $psr7Response->write($ping)) { // The connection of client is closed
+                        break;
                     }
-                } catch (Throwable $e) {
+                    msleep(1000);
                 }
-            },
-            timeout: -1
-        );
+            } catch (Throwable $e) {
+            }
+        });
+
+        Barrier::wait($barrier);
     }
 
     public function writeMessage(string $message): void
