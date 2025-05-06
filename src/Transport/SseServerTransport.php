@@ -14,6 +14,7 @@ namespace FriendsOfHyperf\MCP\Transport;
 use FriendsOfHyperf\MCP\ConnectionManager;
 use FriendsOfHyperf\MCP\Contract\IdGenerator;
 use FriendsOfHyperf\MCP\Contract\SessionIdGenerator;
+use FriendsOfHyperf\MCP\RequestContext;
 use FriendsOfHyperf\MCP\SsePipeMessage;
 use Hyperf\Coroutine\Barrier;
 use Hyperf\Engine\Contract\Http\Writable;
@@ -68,6 +69,10 @@ class SseServerTransport extends AbstractTransport
             ->write("data: {$this->endpoint}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
         $this->connections->register($sessionId, $connection);
 
+        // Set the sessionId and connection to the request context
+        RequestContext::setSessionId($sessionId);
+        RequestContext::setConnection($connection);
+
         defer(function () use ($sessionId) {
             $this->connections->unregister($sessionId);
             $this->close();
@@ -94,6 +99,17 @@ class SseServerTransport extends AbstractTransport
         });
 
         Barrier::wait($barrier);
+    }
+
+    public function handleMessage(string $message): void
+    {
+        $data = json_decode($message, true, 512, JSON_THROW_ON_ERROR);
+
+        RequestContext::setId($data['id'] ?? null);
+        RequestContext::setMethod($data['method'] ?? null);
+        RequestContext::setParams($data['params'] ?? null);
+
+        parent::handleMessage($message);
     }
 
     public function writeMessage(string $message): void
